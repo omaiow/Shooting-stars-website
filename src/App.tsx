@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { TextFlippingBoard } from './components/ui/text-flipping-board';
-import AccretionShaders from './components/ui/accretion';
+import { BackgroundRippleEffect } from './components/ui/background-ripple-effect';
 
 function App() {
   const [boardText, setBoardText] = useState("  A NEW WEBSITE \n\n    COMING SOON  ");
@@ -28,9 +28,9 @@ function App() {
   return (
     <main className="min-h-screen relative flex flex-col items-center justify-center p-4 font-sans overflow-hidden">
 
-      {/* Background Shader Component */}
-      <div className="absolute inset-0 z-0">
-        <AccretionShaders speed={1.2} turbulence={1.2} brightness={1.1} />
+      {/* Background Ripple Effect Component */}
+      <div className="absolute inset-0 z-0 pointer-events-auto overflow-hidden">
+        <BackgroundRippleEffect />
       </div>
 
       {/* Dark overlay to ensure the board remains very visible */}
