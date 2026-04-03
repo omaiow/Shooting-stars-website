@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 
 const TOOLS = [
-  { name: 'Photoshop', years: '9 years', color: '#31a8ff' },
-  { name: 'DaVinci Resolve', years: '6 years', color: '#f97316' },
-  { name: 'CapCut', years: '4 years', color: '#00a35c' },
-  { name: 'Figma', years: '2 years', color: '#a259ff' },
-  { name: 'Lightroom', years: 'personal', color: '#f59e0b' },
+  { name: 'Photoshop', years: '9 years', color: '#31A8FF' }, // Adobe blue
+  { name: 'DaVinci Resolve', years: '6 years', color: '#ED3B49' }, // Resolve aperture red
+  { name: 'CapCut', years: '4 years', color: '#FFFFFF' }, // CapCut white
+  { name: 'Figma', years: '2 years', color: '#F24E1E' }, // Figma red-orange
+  { name: 'Lightroom', years: 'personal', color: '#7DB0E8' }, // Lightroom classic blue
 ];
 
 function ToolRow({ tool, index }: { tool: typeof TOOLS[0]; index: number }) {

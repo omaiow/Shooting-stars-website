@@ -53,39 +53,7 @@
     radial-gradient(at 100% 0%, hsla(339,49%,20%,0.3) 0, transparent 55%);
 }
 
-button {
-  display: flex;
-  align-items: center;
-  font-family: inherit;
-  cursor: pointer;
-  font-weight: 500;
-  font-size: 17px;
-  padding: 0.8em 1.3em 0.8em 0.9em;
-  color: white;
-  background: #ad5389;
-  background: linear-gradient(to right, #0f0c29, #302b63, #24243e);
-  border: none;
-  letter-spacing: 0.05em;
-  border-radius: 16px;
-}
 
-button svg {
-  margin-right: 3px;
-  transform: rotate(30deg);
-  transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
-}
-
-button span {
-  transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
-}
-
-button:hover svg {
-  transform: translateX(5px) rotate(90deg);
-}
-
-button:hover span {
-  transform: translateX(7px);
-}
 
 /* ── Curtain Transition ── */
 .curtain-wrapper {
@@ -97,19 +65,50 @@ button:hover span {
 
 .curtain-panel {
   position: absolute;
-  left: 0;
-  width: 100%;
-  height: 50%;
   background: #000000;
 }
 
-.curtain-top {
+/* HORIZONTAL CLOSING */
+.curtain-left {
   top: 0;
+  left: 0;
+  width: 50vw;
+  height: 100vh;
+  transform: translateX(-100%);
+  animation: curtain-slide-in-left 0.8s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+}
+
+.curtain-right {
+  top: 0;
+  right: 0;
+  width: 50vw;
+  height: 100vh;
+  transform: translateX(100%);
+  animation: curtain-slide-in-right 0.8s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+}
+
+@keyframes curtain-slide-in-left {
+  to { transform: translateX(0%); }
+}
+
+@keyframes curtain-slide-in-right {
+  to { transform: translateX(0%); }
+}
+
+/* VERTICAL OPENING */
+.curtain-top-open {
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 50vh;
   animation: curtain-slide-up 1.2s cubic-bezier(0.76, 0, 0.24, 1) 0.15s forwards;
 }
 
-.curtain-bottom {
+.curtain-bottom-open {
   bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 50vh;
   animation: curtain-slide-down 1.2s cubic-bezier(0.76, 0, 0.24, 1) 0.15s forwards;
 }
 

@@ -3,11 +3,12 @@ import { TextFlippingBoard } from './components/ui/text-flipping-board';
 import { BackgroundRippleEffect } from './components/ui/background-ripple-effect';
 import { CurtainTransition } from './components/ui/curtain-transition';
 import { MainSite } from './components/portfolio/MainSite';
+import { HoverBorderGradient } from './components/ui/hover-border-gradient';
 
 type Page = 'landing' | 'main';
 
 function App() {
-  const [boardText, setBoardText] = useState("  A NEW WEBSITE \n\n    COMING SOON  ");
+  const [boardText, setBoardText] = useState("  WELCOME TO MY \n\n    PORTFOLIO  ");
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [curtainOpen, setCurtainOpen] = useState(false);
   const [page, setPage] = useState<Page>('landing');
@@ -21,8 +22,8 @@ function App() {
 
   useEffect(() => {
     const sequence = [
-      " SHOOTING STARS\n       STUDIO   \n ",
-      " UNDER CONSTRUCTION \n  COMING BACK \n    SOON ",
+      " SHOOTING STARS \n \n       STUDIO   \n ",
+      " HELLO \n I'M SHAUN \n WELCOME TO MY PORTFOLIO ",
     ];
     let i = 0;
     const timeout = setTimeout(() => {
@@ -38,10 +39,13 @@ function App() {
   }, []);
 
   const handleEnterSite = useCallback(() => {
-    // Immediately switch to main site underneath the curtain
-    setPage('main');
-    // Then trigger the curtain to mount and slide open
+    // Start curtain transition
     setCurtainOpen(true);
+  }, []);
+
+  const handleMidpoint = useCallback(() => {
+    // Switch to main site when curtains are fully closed horizontally
+    setPage('main');
   }, []);
 
   const handleTransitionComplete = useCallback(() => {
@@ -52,7 +56,7 @@ function App() {
     <>
       {/* Curtain overlay — only mounted once button is clicked */}
       {curtainOpen && (
-        <CurtainTransition onComplete={handleTransitionComplete} />
+        <CurtainTransition onMidpoint={handleMidpoint} onComplete={handleTransitionComplete} />
       )}
 
       {page === 'landing' && (
@@ -77,10 +81,14 @@ function App() {
             />
 
             <div className="mt-12">
-              <button onClick={handleEnterSite} id="enter-site-btn">
+              <HoverBorderGradient
+                containerClassName="cursor-pointer"
+                className="flex items-center gap-2 px-6 py-2 bg-[#030712] font-semibold tracking-wide text-sm"
+                onClick={handleEnterSite}
+              >
                 <svg
-                  height="24"
-                  width="24"
+                  height="20"
+                  width="20"
                   viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
                 >
@@ -91,7 +99,7 @@ function App() {
                   ></path>
                 </svg>
                 <span>Enter Site</span>
-              </button>
+              </HoverBorderGradient>
             </div>
           </div>
         </main>
