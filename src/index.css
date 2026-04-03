@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #030712;
+  --color-foreground: #f9fafb;
+}
+
+@utility perspective-dramatic {
+  perspective: 1200px;
+}
+
+@utility transform-3d {
+  transform-style: preserve-3d;
+}
+
+@utility backface-hidden {
+  backface-visibility: hidden;
+}
+
+@utility mask-t-from-50\% {
+  mask-image: linear-gradient(to top, transparent, black 150%);
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+}
+
+.bg-mesh {
+  background-color: #030712;
+  background-image: 
+    radial-gradient(at 0% 0%, hsla(253,16%,17%,1) 0, transparent 55%), 
+    radial-gradient(at 50% 0%, hsla(225,39%,25%,0.5) 0, transparent 65%), 
+    radial-gradient(at 100% 0%, hsla(339,49%,20%,0.3) 0, transparent 55%);
+}
