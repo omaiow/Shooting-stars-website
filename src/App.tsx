@@ -4,6 +4,15 @@ import { BackgroundRippleEffect } from './components/ui/background-ripple-effect
 
 function App() {
   const [boardText, setBoardText] = useState("  A NEW WEBSITE \n\n    COMING SOON  ");
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    setDimensions({ width: window.innerWidth, height: window.innerHeight });
+    const handleResize = () => setDimensions({ width: window.innerWidth, height: window.innerHeight });
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
 
   useEffect(() => {
     // Optionally cycle through messages
@@ -30,7 +39,12 @@ function App() {
 
       {/* Background Ripple Effect Component */}
       <div className="absolute inset-0 z-0 pointer-events-auto overflow-hidden">
-        <BackgroundRippleEffect />
+        {dimensions.width > 0 && (
+          <BackgroundRippleEffect 
+            rows={Math.ceil(dimensions.height / 56) + 1} 
+            cols={Math.ceil(dimensions.width / 56) + 1} 
+          />
+        )}
       </div>
 
       {/* Dark overlay to ensure the board remains very visible */}
