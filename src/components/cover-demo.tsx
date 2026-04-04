@@ -1,4 +1,3 @@
-import React from "react";
 import { Cover } from "@/components/ui/cover";
 
 export default function CoverDemo() {

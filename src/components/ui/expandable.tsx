@@ -1,15 +1,15 @@
 import React, {
   createContext,
-  ReactNode,
+  type ReactNode,
   useContext,
   useEffect,
   useState,
 } from "react"
 import {
   AnimatePresence,
-  HTMLMotionProps,
+  type HTMLMotionProps,
   motion,
-  TargetAndTransition,
+  type TargetAndTransition,
   useMotionValue,
   useSpring,
 } from "motion/react"
@@ -204,12 +204,6 @@ const ANIMATION_PRESETS: Record<string, AnimationPreset> = {
   },
 }
 
-// Update type definitions
-type AnimationConfig = {
-  initial: { [key: string]: number | string }
-  animate: { [key: string]: number | string }
-  exit: { [key: string]: number | string }
-}
 
 // Props for defining custom animations
 interface AnimationProps {
@@ -234,8 +228,8 @@ const getAnimationProps = (
   const presetAnimation = preset ? ANIMATION_PRESETS[preset] : defaultAnimation
 
   return {
-    initial: presetAnimation.initial,
-    animate: presetAnimation.animate,
+    initial: animateIn?.initial || presetAnimation.initial,
+    animate: animateIn?.animate || presetAnimation.animate,
     exit: animateOut?.exit || presetAnimation.exit,
   }
 }
