@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 
 const TOOLS = [
-  { name: 'Photoshop', years: '9 years', color: '#31A8FF' }, // Adobe blue
-  { name: 'DaVinci Resolve', years: '6 years', color: '#ED3B49' }, // Resolve aperture red
-  { name: 'CapCut', years: '4 years', color: '#FFFFFF' }, // CapCut white
-  { name: 'Figma', years: '2 years', color: '#F24E1E' }, // Figma red-orange
-  { name: 'Lightroom', years: 'personal', color: '#7DB0E8' }, // Lightroom classic blue
+  { name: 'Photoshop', years: '9 years', color: '#31A8FF', percent: 100 }, // Adobe blue
+  { name: 'DaVinci Resolve', years: '6 years', color: '#ED3B49', percent: 66 }, // Resolve aperture red
+  { name: 'CapCut', years: '4 years', color: '#FFFFFF', percent: 44 }, // CapCut white
+  { name: 'Figma', years: '2 years', color: '#F24E1E', percent: 22 }, // Figma red-orange
+  { name: 'Lightroom', years: 'personal', color: '#7DB0E8', percent: 15 }, // Lightroom classic blue
 ];
 
 function ToolRow({ tool, index }: { tool: typeof TOOLS[0]; index: number }) {
@@ -38,12 +38,11 @@ function ToolRow({ tool, index }: { tool: typeof TOOLS[0]; index: number }) {
         {tool.name}
       </span>
 
-      <div className="flex-1 relative h-px overflow-hidden">
-        <div className="absolute inset-0 bg-white/5" />
+      <div className="flex-1 relative h-px overflow-hidden bg-white/5 rounded-full">
         <div
-          className="absolute left-0 top-0 bottom-0 transition-all duration-1000"
+          className="absolute left-0 top-0 bottom-0 transition-all duration-1000 rounded-full"
           style={{
-            width: visible ? '100%' : '0%',
+            width: visible ? `${tool.percent}%` : '0%',
             background: tool.color,
             transitionDelay: `${index * 100 + 300}ms`,
           }}
