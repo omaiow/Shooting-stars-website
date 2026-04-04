@@ -10,13 +10,19 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@radix-ui/react-hover-card": "^1.1.15",
     "@tabler/icons-react": "^3.41.1",
+    "@tsparticles/engine": "^3.9.1",
+    "@tsparticles/react": "^3.0.0",
+    "@tsparticles/slim": "^3.9.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
     "motion": "^12.38.0",
+    "qss": "^3.0.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-shaders": "^0.0.4",
+    "react-use-measure": "^2.1.7",
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {

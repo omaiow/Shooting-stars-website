@@ -4,8 +4,8 @@ const TOOLS = [
   { name: 'Photoshop', years: '9 years', color: '#31A8FF', percent: 100 }, // Adobe blue
   { name: 'DaVinci Resolve', years: '6 years', color: '#ED3B49', percent: 66 }, // Resolve aperture red
   { name: 'CapCut', years: '4 years', color: '#FFFFFF', percent: 44 }, // CapCut white
+  { name: 'Lightroom', years: '3 years', color: '#7DB0E8', percent: 33 }, // Lightroom classic blue
   { name: 'Figma', years: '2 years', color: '#F24E1E', percent: 22 }, // Figma red-orange
-  { name: 'Lightroom', years: 'personal', color: '#7DB0E8', percent: 15 }, // Lightroom classic blue
 ];
 
 function ToolRow({ tool, index }: { tool: typeof TOOLS[0]; index: number }) {
