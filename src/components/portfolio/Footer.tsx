@@ -24,7 +24,7 @@ export function Footer() {
             <div className="flex flex-col gap-3">
               <LinkPreview
                 url="https://instagram.com/shauncena17"
-                className="group flex items-center justify-between border border-white/10 hover:border-[#00a35c]/40 rounded-2xl px-6 py-4 transition-all hover:bg-[#00a35c]/5 w-full block"
+                className="group flex items-center justify-between border border-white/10 hover:border-[#00a35c]/40 rounded-2xl px-6 py-4 transition-all hover:bg-[#00a35c]/5 w-full"
               >
                 <div className="flex items-center gap-3">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#00a35c]">
@@ -44,7 +44,7 @@ export function Footer() {
 
               <LinkPreview
                 url="https://youtube.com/@oma1036"
-                className="group flex items-center justify-between border border-white/10 hover:border-red-500/40 rounded-2xl px-6 py-4 transition-all hover:bg-red-500/5 w-full block"
+                className="group flex items-center justify-between border border-white/10 hover:border-red-500/40 rounded-2xl px-6 py-4 transition-all hover:bg-red-500/5 w-full"
               >
                 <div className="flex items-center gap-3">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-red-500">
@@ -62,7 +62,7 @@ export function Footer() {
 
               <LinkPreview
                 url="https://instagram.com/omai.design"
-                className="group flex items-center justify-between border border-white/10 hover:border-[#a855f7]/40 rounded-2xl px-6 py-4 transition-all hover:bg-[#a855f7]/5 w-full block"
+                className="group flex items-center justify-between border border-white/10 hover:border-[#a855f7]/40 rounded-2xl px-6 py-4 transition-all hover:bg-[#a855f7]/5 w-full"
               >
                 <div className="flex items-center gap-3">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#a855f7]">
