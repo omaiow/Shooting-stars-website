@@ -51,7 +51,7 @@ const PHOTO_CARDS: FocusCard[] = [
     accentColor: '#f59e0b',
     location: 'Polytechnic University of the Philippines Manila',
     camera: 'Canon EOS M50 Mark II',
-    thoughtProcess: 'It was a school event and the we were there early to prepare our booth, and i noticed the way the light was hitting the obelisk and it caught my eye.',
+    thoughtProcess: 'It was a school ecavent and the we were there early to prepare our booth, and i noticed the way the light was hitting the obelisk and it caught my eye.',
   },
 ];
 

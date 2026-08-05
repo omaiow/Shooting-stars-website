@@ -80,6 +80,24 @@ export function Footer() {
                 </svg>
               </LinkPreview>
 
+              <LinkPreview
+                url="https://pupascii.vercel.app"
+                className="group flex items-center justify-between border border-white/10 hover:border-[#06b6d4]/40 rounded-2xl px-6 py-4 transition-all hover:bg-[#06b6d4]/5 w-full"
+              >
+                <div className="flex items-center gap-3">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#06b6d4]">
+                    <path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                  </svg>
+                  <div className="text-left">
+                    <p className="text-white font-medium text-sm">PupASCII</p>
+                    <p className="text-neutral-500 text-xs">Collaborative project</p>
+                  </div>
+                </div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-neutral-600 group-hover:text-white group-hover:translate-x-1 group-hover:-translate-y-1 transition-all">
+                  <path d="M7 17L17 7M17 7H7M17 7v10" />
+                </svg>
+              </LinkPreview>
+
               <a
                 href="mailto:siashaun4@gmail.com"
                 className="group flex items-center justify-between border border-white/10 hover:border-white/30 rounded-2xl px-6 py-4 transition-all hover:bg-white/5"

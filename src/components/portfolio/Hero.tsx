@@ -38,7 +38,7 @@ function FloatingStar({ size, x, y, delay, duration }: typeof STARS[0]) {
   );
 }
 
-const SUBTITLE = "Graphic Designer · Video Editor · Creative Lead";
+const SUBTITLE = "Graphic Designer · UI/UX Designer · Video Editor · Creative Lead";
 
 export function Hero() {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
