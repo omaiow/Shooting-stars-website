@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, memo } from 'react';
+import { InstagramIcon, YouTubeIcon } from '../ui/icons';
 
-export function About() {
+export const About = memo(function About() {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
 
@@ -65,11 +66,7 @@ export function About() {
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm text-neutral-400 hover:text-white transition-colors border border-white/10 hover:border-white/30 rounded-full px-4 py-2"
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                  <circle cx="12" cy="12" r="4" />
-                  <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
-                </svg>
+                <InstagramIcon size={14} />
                 @shauncena17
               </a>
               <a
@@ -78,9 +75,7 @@ export function About() {
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm text-neutral-400 hover:text-white transition-colors border border-white/10 hover:border-white/30 rounded-full px-4 py-2"
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19.59 6.69a4.83 4.83 0 0 0-3.77-2.7C14.09 4 12 4 12 4s-2.09 0-3.82.27a4.83 4.83 0 0 0-3.77 2.7A26 26 0 0 0 4 12a26 26 0 0 0 .41 5.34 4.83 4.83 0 0 0 3.77 2.7C9.91 20.27 12 20 12 20s2.09 0 3.82-.27a4.83 4.83 0 0 0 3.77-2.7A26 26 0 0 0 20 12a26 26 0 0 0-.41-5.31zM10 15.5v-7l6 3.5z" />
-                </svg>
+                <YouTubeIcon size={14} />
                 @oma1036
               </a>
             </div>
@@ -89,4 +84,4 @@ export function About() {
       </div>
     </section>
   );
-}
+});

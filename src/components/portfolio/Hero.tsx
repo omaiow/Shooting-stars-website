@@ -1,8 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback, memo } from 'react';
 import { motion, useSpring, useTransform, useMotionValue } from 'motion/react';
 import { Spotlight } from '../ui/spotlight';
 import { TextGenerateEffect } from '../ui/text-generate-effect';
 import { BackgroundRippleEffect } from '../ui/background-ripple-effect';
+import { useDimensions } from '@/hooks/use-dimensions';
+import { scrollToSection } from '@/lib/scroll';
 
 // Floating star particles
 const STARS = [
@@ -16,7 +18,7 @@ const STARS = [
   { size: 6,  x: '60%', y: '10%', delay: 0.3,  duration: 8  },
 ];
 
-function FloatingStar({ size, x, y, delay, duration }: typeof STARS[0]) {
+const FloatingStar = memo(function FloatingStar({ size, x, y, delay, duration }: typeof STARS[0]) {
   return (
     <motion.span
       className="absolute pointer-events-none select-none text-[#00a35c]"
@@ -36,12 +38,12 @@ function FloatingStar({ size, x, y, delay, duration }: typeof STARS[0]) {
       ✦
     </motion.span>
   );
-}
+});
 
 const SUBTITLE = "Graphic Designer · UI/UX Designer · Video Editor · Creative Lead";
 
 export function Hero() {
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const dimensions = useDimensions();
   const [ready, setReady] = useState(false);
 
   // Mouse parallax
@@ -57,30 +59,23 @@ export function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    setDimensions({ width: window.innerWidth, height: window.innerHeight });
-    const handleResize = () =>
-      setDimensions({ width: window.innerWidth, height: window.innerHeight });
-    window.addEventListener('resize', handleResize);
     const t = setTimeout(() => setReady(true), 200);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      clearTimeout(t);
-    };
+    return () => clearTimeout(t);
   }, []);
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
     const rect = sectionRef.current?.getBoundingClientRect();
     if (!rect) return;
     const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     const ny = ((e.clientY - rect.top) / rect.height) * 2 - 1;
     mouseX.set(nx);
     mouseY.set(ny);
-  };
+  }, [mouseX, mouseY]);
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = useCallback(() => {
     mouseX.set(0);
     mouseY.set(0);
-  };
+  }, [mouseX, mouseY]);
 
   return (
     <section
@@ -175,14 +170,14 @@ export function Hero() {
         >
           <a
             href="#work"
-            onClick={(e) => { e.preventDefault(); document.querySelector('#work')?.scrollIntoView({ behavior: 'smooth' }); }}
+            onClick={(e) => { e.preventDefault(); scrollToSection('#work'); }}
             className="px-6 py-3 rounded-full bg-[#00a35c] text-black font-bold text-sm hover:bg-[#00c46e] transition-colors"
           >
             View My Work
           </a>
           <a
             href="#contact"
-            onClick={(e) => { e.preventDefault(); document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' }); }}
+            onClick={(e) => { e.preventDefault(); scrollToSection('#contact'); }}
             className="px-6 py-3 rounded-full border border-white/10 text-white text-sm hover:border-white/30 transition-colors"
           >
             Get in Touch

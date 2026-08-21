@@ -1,4 +1,5 @@
 import { LinkPreview } from "@/components/ui/link-preview";
+import { InstagramIcon, YouTubeIcon, ArrowUpRightIcon, EmailIcon, CodeIcon } from "@/components/ui/icons";
 
 export function Footer() {
   return (
@@ -27,19 +28,13 @@ export function Footer() {
                 className="group flex items-center justify-between border border-white/10 hover:border-[#00a35c]/40 rounded-2xl px-6 py-4 transition-all hover:bg-[#00a35c]/5 w-full"
               >
                 <div className="flex items-center gap-3">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#00a35c]">
-                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                    <circle cx="12" cy="12" r="4" />
-                    <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
-                  </svg>
+                  <InstagramIcon size={20} className="text-[#00a35c]" />
                   <div className="text-left">
                     <p className="text-white font-medium text-sm">Instagram</p>
                     <p className="text-neutral-500 text-xs">@shauncena17</p>
                   </div>
                 </div>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-neutral-600 group-hover:text-white group-hover:translate-x-1 group-hover:-translate-y-1 transition-all">
-                  <path d="M7 17L17 7M17 7H7M17 7v10" />
-                </svg>
+                <ArrowUpRightIcon className="text-neutral-600 group-hover:text-white group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
               </LinkPreview>
 
               <LinkPreview
@@ -47,17 +42,13 @@ export function Footer() {
                 className="group flex items-center justify-between border border-white/10 hover:border-red-500/40 rounded-2xl px-6 py-4 transition-all hover:bg-red-500/5 w-full"
               >
                 <div className="flex items-center gap-3">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-red-500">
-                    <path d="M19.59 6.69a4.83 4.83 0 0 0-3.77-2.7C14.09 4 12 4 12 4s-2.09 0-3.82.27a4.83 4.83 0 0 0-3.77 2.7A26 26 0 0 0 4 12a26 26 0 0 0 .41 5.34 4.83 4.83 0 0 0 3.77 2.7C9.91 20.27 12 20 12 20s2.09 0 3.82-.27a4.83 4.83 0 0 0 3.77-2.7A26 26 0 0 0 20 12a26 26 0 0 0-.41-5.31zM10 15.5v-7l6 3.5z" />
-                  </svg>
+                  <YouTubeIcon size={20} className="text-red-500" />
                   <div className="text-left">
                     <p className="text-white font-medium text-sm">YouTube</p>
                     <p className="text-neutral-500 text-xs">@oma1036</p>
                   </div>
                 </div>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-neutral-600 group-hover:text-white group-hover:translate-x-1 group-hover:-translate-y-1 transition-all">
-                  <path d="M7 17L17 7M17 7H7M17 7v10" />
-                </svg>
+                <ArrowUpRightIcon className="text-neutral-600 group-hover:text-white group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
               </LinkPreview>
 
               <LinkPreview
@@ -65,19 +56,13 @@ export function Footer() {
                 className="group flex items-center justify-between border border-white/10 hover:border-[#a855f7]/40 rounded-2xl px-6 py-4 transition-all hover:bg-[#a855f7]/5 w-full"
               >
                 <div className="flex items-center gap-3">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#a855f7]">
-                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                    <circle cx="12" cy="12" r="4" />
-                    <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
-                  </svg>
+                  <InstagramIcon size={20} className="text-[#a855f7]" />
                   <div className="text-left">
                     <p className="text-white font-medium text-sm">Design Instagram</p>
                     <p className="text-neutral-500 text-xs">@omai.design</p>
                   </div>
                 </div>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-neutral-600 group-hover:text-white group-hover:translate-x-1 group-hover:-translate-y-1 transition-all">
-                  <path d="M7 17L17 7M17 7H7M17 7v10" />
-                </svg>
+                <ArrowUpRightIcon className="text-neutral-600 group-hover:text-white group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
               </LinkPreview>
 
               <LinkPreview
@@ -85,17 +70,13 @@ export function Footer() {
                 className="group flex items-center justify-between border border-white/10 hover:border-[#06b6d4]/40 rounded-2xl px-6 py-4 transition-all hover:bg-[#06b6d4]/5 w-full"
               >
                 <div className="flex items-center gap-3">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#06b6d4]">
-                    <path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                  </svg>
+                  <CodeIcon size={20} className="text-[#06b6d4]" />
                   <div className="text-left">
                     <p className="text-white font-medium text-sm">PupASCII</p>
                     <p className="text-neutral-500 text-xs">Collaborative project</p>
                   </div>
                 </div>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-neutral-600 group-hover:text-white group-hover:translate-x-1 group-hover:-translate-y-1 transition-all">
-                  <path d="M7 17L17 7M17 7H7M17 7v10" />
-                </svg>
+                <ArrowUpRightIcon className="text-neutral-600 group-hover:text-white group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
               </LinkPreview>
 
               <a
@@ -103,18 +84,13 @@ export function Footer() {
                 className="group flex items-center justify-between border border-white/10 hover:border-white/30 rounded-2xl px-6 py-4 transition-all hover:bg-white/5"
               >
                 <div className="flex items-center gap-3">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-neutral-400">
-                    <rect x="2" y="4" width="20" height="16" rx="2" />
-                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-                  </svg>
+                  <EmailIcon size={20} className="text-neutral-400" />
                   <div className="text-left">
                     <p className="text-white font-medium text-sm">Email</p>
                     <p className="text-neutral-500 text-xs">siashaun4@gmail.com</p>
                   </div>
                 </div>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-neutral-600 group-hover:text-white group-hover:translate-x-1 group-hover:-translate-y-1 transition-all">
-                  <path d="M7 17L17 7M17 7H7M17 7v10" />
-                </svg>
+                <ArrowUpRightIcon className="text-neutral-600 group-hover:text-white group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
               </a>
             </div>
           </div>

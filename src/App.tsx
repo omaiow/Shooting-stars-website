@@ -1,24 +1,21 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { TextFlippingBoard } from './components/ui/text-flipping-board';
 import { BackgroundRippleEffect } from './components/ui/background-ripple-effect';
 import { CurtainTransition } from './components/ui/curtain-transition';
-import { MainSite } from './components/portfolio/MainSite';
 import { HoverBorderGradient } from './components/ui/hover-border-gradient';
+import { useDimensions } from './hooks/use-dimensions';
+
+const MainSite = lazy(() =>
+  import('./components/portfolio/MainSite').then((m) => ({ default: m.MainSite }))
+);
 
 type Page = 'landing' | 'main';
 
 function App() {
   const [boardText, setBoardText] = useState("  WELCOME TO MY \n\n    PORTFOLIO  ");
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [curtainOpen, setCurtainOpen] = useState(false);
   const [page, setPage] = useState<Page>('landing');
-
-  useEffect(() => {
-    setDimensions({ width: window.innerWidth, height: window.innerHeight });
-    const handleResize = () => setDimensions({ width: window.innerWidth, height: window.innerHeight });
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  const dimensions = useDimensions();
 
   useEffect(() => {
     const sequence = [
@@ -105,7 +102,11 @@ function App() {
         </main>
       )}
 
-      {page === 'main' && <MainSite />}
+      {page === 'main' && (
+        <Suspense fallback={<div className="min-h-screen bg-[#030712]" />}>
+          <MainSite />
+        </Suspense>
+      )}
     </>
   );
 }

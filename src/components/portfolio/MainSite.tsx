@@ -15,6 +15,8 @@ import { PhotoSection } from './PhotoSection';
 import { Tools } from './Tools';
 import { About } from './About';
 import { Footer } from './Footer';
+import { InstagramIcon, YouTubeIcon } from '../ui/icons';
+import { scrollToSection } from '@/lib/scroll';
 
 const NAV_ITEMS = [
   { name: 'Video', link: '#work' },
@@ -32,7 +34,7 @@ function PortfolioLogo() {
       className="relative z-20 flex items-center gap-2 px-2 py-1"
       onClick={(e) => {
         e.preventDefault();
-        document.querySelector('#hero')?.scrollIntoView({ behavior: 'smooth' });
+        scrollToSection('#hero');
       }}
     >
       <div className="w-7 h-7 flex items-center justify-center flex-shrink-0">
@@ -53,11 +55,7 @@ function SocialLinks() {
         className="w-8 h-8 rounded-full flex items-center justify-center text-neutral-400 hover:text-white hover:bg-white/10 transition-all"
         aria-label="Instagram @shauncena17"
       >
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-          <circle cx="12" cy="12" r="4"/>
-          <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
-        </svg>
+        <InstagramIcon size={15} />
       </a>
       <a
         href="https://youtube.com/@oma1036"
@@ -66,9 +64,7 @@ function SocialLinks() {
         className="w-8 h-8 rounded-full flex items-center justify-center text-neutral-400 hover:text-white hover:bg-white/10 transition-all"
         aria-label="YouTube @oma1036"
       >
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M19.59 6.69a4.83 4.83 0 0 0-3.77-2.7C14.09 4 12 4 12 4s-2.09 0-3.82.27a4.83 4.83 0 0 0-3.77 2.7A26 26 0 0 0 4 12a26 26 0 0 0 .41 5.34 4.83 4.83 0 0 0 3.77 2.7C9.91 20.27 12 20 12 20s2.09 0 3.82-.27a4.83 4.83 0 0 0 3.77-2.7A26 26 0 0 0 20 12a26 26 0 0 0-.41-5.31zM10 15.5v-7l6 3.5z"/>
-        </svg>
+        <YouTubeIcon size={15} />
       </a>
     </div>
   );
@@ -80,7 +76,7 @@ export function MainSite() {
   const handleNavClick = (href: string) => {
     setMobileOpen(false);
     setTimeout(() => {
-      document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
+      scrollToSection(href);
     }, 100);
   };
 

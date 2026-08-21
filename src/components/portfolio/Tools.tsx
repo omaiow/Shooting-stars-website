@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, memo } from 'react';
 
 const TOOLS = [
   { name: 'Photoshop', years: '9 years', color: '#31A8FF', percent: 100 }, // Adobe blue
@@ -8,7 +8,7 @@ const TOOLS = [
   { name: 'Figma', years: '2 years', color: '#F24E1E', percent: 22 }, // Figma red-orange
 ];
 
-function ToolRow({ tool, index }: { tool: typeof TOOLS[0]; index: number }) {
+const ToolRow = memo(function ToolRow({ tool, index }: { tool: typeof TOOLS[0]; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
 
@@ -57,7 +57,7 @@ function ToolRow({ tool, index }: { tool: typeof TOOLS[0]; index: number }) {
       </span>
     </div>
   );
-}
+});
 
 export function Tools() {
   return (

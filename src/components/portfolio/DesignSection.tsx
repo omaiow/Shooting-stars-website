@@ -8,7 +8,7 @@ const DESIGN_CARDS: FocusCard[] = [
     title: 'Formula 1 Inspired',
     src: "https://i.imgur.com/4Q1hHuW.jpeg",
     accentColor: '#3b82f6',
-    description: 'A high-octane poster series inspired by F1 racing aesthetics — speed, precision, motion blur.',
+    description: 'A high-octane poster series inspired by F1 racing aesthetics â€” speed, precision, motion blur.',
     process: 'Started with high-res reference photos and existing 3d models of the cars from the internet. I then used blender to edit the models to customize the cars to fit the branding of my academic organization (PUP ASCII) and to get the angles and lighting i wanted for the shot. I then took it into photoshop to composite the image along with the text and other elements.',
     software: [
       { name: 'Photoshop', role: 'Compositing, motion FX & typography' },
@@ -54,7 +54,7 @@ const DESIGN_CARDS: FocusCard[] = [
     title: 'Retro Design',
     src: "https://i.imgur.com/yxSY9Mk.jpeg",
     accentColor: '#3b82f6',
-    description: 'A throwback aesthetic piece pulling from 70s–80s print design — grain, muted palettes, and vintage type.',
+    description: 'A throwback aesthetic piece pulling from 70sâ€“80s print design â€” grain, muted palettes, and vintage type.',
     process: 'Added film grain and halftone overlays on top of the base composition, then pushed the warmth and reduced contrast to mimic aged print. Typography was sourced from display fonts common in that era.',
     software: [
       { name: 'Photoshop', role: 'Grain, halftone FX & vintage colour treatment' },
@@ -64,7 +64,7 @@ const DESIGN_CARDS: FocusCard[] = [
     title: 'Pop Design',
     src: "https://i.imgur.com/X05z60Q.jpeg",
     accentColor: '#3b82f6',
-    description: 'A bold, maximalist pop art piece — flat colours, loud type, high contrast.',
+    description: 'A bold, maximalist pop art piece â€” flat colours, loud type, high contrast.',
     process: 'Inspired by pop art and contemporary pop illustration. Started with a clean vector base in Figma for the layout, then moved to Photoshop to add halftone dots and light effects. The goal was to feel unapologetically loud.',
     software: [
       { name: 'Figma', role: 'Layout & vector structure' },
