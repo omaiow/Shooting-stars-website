@@ -30,7 +30,7 @@ export const About = memo(function About() {
           >
             <h2 className="text-6xl md:text-7xl font-black text-white leading-tight tracking-tight">
               Design.<br />
-              <span className="text-[#00a35c]">Video.</span><br />
+              <span className="text-[#2563eb]">Video.</span><br />
               Creative.
             </h2>
           </div>
@@ -46,7 +46,7 @@ export const About = memo(function About() {
           >
             <p className="text-neutral-300 text-lg leading-relaxed">
               Hi! I'm <span className="text-white font-semibold">Shaun Sia</span>, otherwise known as{' '}
-              <span className="text-[#00a35c] font-semibold">Omai</span> online. I'm a Graphic Designer
+              <span className="text-[#2563eb] font-semibold">Omai</span> online. I'm a Graphic Designer
               and UI/UX Designer with extensive experience leading creative teams.
             </p>
             <p className="text-neutral-400 leading-relaxed">

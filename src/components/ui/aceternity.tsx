@@ -107,7 +107,7 @@ interface MovingBorderProps {
   borderColor?: string;
 }
 
-export function MovingBorder({ children, className = '', borderColor = '#00a35c' }: MovingBorderProps) {
+export function MovingBorder({ children, className = '', borderColor = '#2563eb' }: MovingBorderProps) {
   return (
     <div className={`moving-border-wrapper ${className}`}>
       <div

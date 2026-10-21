@@ -38,7 +38,7 @@ function PortfolioLogo() {
       }}
     >
       <div className="w-7 h-7 flex items-center justify-center flex-shrink-0">
-        <span className="text-[#00a35c] text-2xl leading-none">✦</span>
+        <span className="text-[#2563eb] text-2xl leading-none">✦</span>
       </div>
       <span className="font-bold text-white text-sm tracking-wide">Shon</span>
     </a>

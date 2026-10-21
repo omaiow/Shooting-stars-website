@@ -29,7 +29,7 @@ export function VideoSection() {
           {VIDEOS.map((video) => (
             <div
               key={video.id}
-              className="group relative rounded-2xl overflow-hidden border border-white/5 hover:border-[#00a35c]/30 transition-all duration-300"
+              className="group relative rounded-2xl overflow-hidden border border-white/5 hover:border-[#2563eb]/30 transition-all duration-300"
               style={{ background: '#0a0a0a' }}
             >
               {/* 16:9 iframe wrapper */}
@@ -49,7 +49,7 @@ export function VideoSection() {
 
         <div className="mt-8 flex flex-wrap gap-2">
           {['CapCut', 'DaVinci Resolve', 'Edits', '@oma1036'].map(tag => (
-            <span key={tag} className="text-xs px-3 py-1 rounded-full border border-[#00a35c]/20 text-[#00a35c]/70 bg-[#00a35c]/5 font-mono">
+            <span key={tag} className="text-xs px-3 py-1 rounded-full border border-[#2563eb]/20 text-[#2563eb]/70 bg-[#2563eb]/5 font-mono">
               {tag}
             </span>
           ))}

@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@radix-ui/react-hover-card": "^1.1.15",
+    "@splinetool/react-spline": "^4.1.0",
+    "@splinetool/runtime": "^2.0.98",
     "@tabler/icons-react": "^3.46.0",
     "@tsparticles/engine": "^4.3.2",
     "@tsparticles/react": "^4.3.2",

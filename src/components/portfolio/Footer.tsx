@@ -11,7 +11,7 @@ export function Footer() {
             <p className="text-xs tracking-[0.3em] uppercase text-neutral-500 mb-4 font-medium">Contact</p>
             <h2 className="text-5xl md:text-6xl font-black text-white tracking-tight leading-tight">
               Let's work<br />
-              <span className="text-[#00a35c]">together.</span>
+              <span className="text-[#2563eb]">together.</span>
             </h2>
           </div>
 
@@ -25,10 +25,10 @@ export function Footer() {
             <div className="flex flex-col gap-3">
               <LinkPreview
                 url="https://instagram.com/shauncena17"
-                className="group flex items-center justify-between border border-white/10 hover:border-[#00a35c]/40 rounded-2xl px-6 py-4 transition-all hover:bg-[#00a35c]/5 w-full"
+                className="group flex items-center justify-between border border-white/10 hover:border-[#2563eb]/40 rounded-2xl px-6 py-4 transition-all hover:bg-[#2563eb]/5 w-full"
               >
                 <div className="flex items-center gap-3">
-                  <InstagramIcon size={20} className="text-[#00a35c]" />
+                  <InstagramIcon size={20} className="text-[#2563eb]" />
                   <div className="text-left">
                     <p className="text-white font-medium text-sm">Instagram</p>
                     <p className="text-neutral-500 text-xs">@shauncena17</p>
