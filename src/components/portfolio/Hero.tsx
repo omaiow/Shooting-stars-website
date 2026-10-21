@@ -54,7 +54,7 @@ export function Hero() {
 
       {/* Main content with parallax */}
       <motion.div
-        className="relative z-10 top-36 text-center max-w-5xl px-4"
+        className="relative z-10 top-[clamp(11rem,30vh,18rem)] text-center max-w-5xl px-4"
         style={{ x: headingX, y: headingY }}
       >
         {/* Subtitle — fades in after heading */}
