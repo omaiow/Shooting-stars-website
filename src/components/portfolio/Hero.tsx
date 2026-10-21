@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useRef, useCallback } from 'react';
 import { motion, useSpring, useTransform, useMotionValue } from 'motion/react';
 import Spline from '@splinetool/react-spline';
 import { scrollToSection } from '@/lib/scroll';
@@ -6,8 +6,6 @@ import { scrollToSection } from '@/lib/scroll';
 const SUBTITLE = "Graphic Designer · UI/UX Designer · Video Editor · Creative Lead";
 
 export function Hero() {
-  const [ready, setReady] = useState(false);
-
   // Mouse parallax
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -17,11 +15,6 @@ export function Hero() {
   const headingY = useTransform(springY, [-1, 1], [-8, 8]);
 
   const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const t = setTimeout(() => setReady(true), 200);
-    return () => clearTimeout(t);
-  }, []);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     const rect = sectionRef.current?.getBoundingClientRect();
@@ -57,23 +50,12 @@ export function Hero() {
         className="relative z-10 top-[clamp(15rem,40vh,22rem)] text-center max-w-5xl px-4"
         style={{ x: headingX, y: headingY }}
       >
-        {/* Subtitle — fades in after heading */}
-        <motion.p
-          className="text-white text-lg md:text-xl tracking-wide"
-          initial={{ opacity: 0 }}
-          animate={ready ? { opacity: 1 } : {}}
-          transition={{ duration: 0.8, delay: 1.4 }}
-        >
+        <p className="text-white text-lg md:text-xl tracking-wide">
           {SUBTITLE}
-        </motion.p>
+        </p>
 
         {/* CTA row */}
-        <motion.div
-          className="flex items-center justify-center gap-4 mt-10"
-          initial={{ opacity: 0, y: 20 }}
-          animate={ready ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 1.8 }}
-        >
+        <div className="flex items-center justify-center gap-4 mt-10">
           <a
             href="#work"
             onClick={(e) => { e.preventDefault(); scrollToSection('#work'); }}
@@ -88,16 +70,11 @@ export function Hero() {
           >
             Get in Touch
           </a>
-        </motion.div>
+        </div>
       </motion.div>
 
       {/* Bottom — label + scroll */}
-      <motion.div
-        className="absolute bottom-8 left-0 right-0 flex items-center justify-between px-8 z-10"
-        initial={{ opacity: 0 }}
-        animate={ready ? { opacity: 1 } : {}}
-        transition={{ duration: 0.6, delay: 2.2 }}
-      >
+      <div className="absolute bottom-8 left-0 right-0 flex items-center justify-between px-8 z-10">
         <span className="text-neutral-600 text-xs tracking-widest uppercase">2026</span>
         <div className="flex flex-col items-center gap-2">
           <span className="text-neutral-600 text-xs tracking-widest">Scroll</span>
@@ -107,7 +84,7 @@ export function Hero() {
             transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
           />
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 }

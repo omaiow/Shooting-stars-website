@@ -3,11 +3,11 @@
 import { FocusCards } from '../ui/focus-cards';
 import type { FocusCard } from '../ui/focus-cards';
 
-// Placeholder gradient cards — swap src in when you have real images
+// Photography cards displayed in the portfolio's focus-card gallery.
 const PHOTO_CARDS: FocusCard[] = [
   {
     title: 'The Wall',
-    src: "https://instagram.fmnl44-1.fna.fbcdn.net/v/t51.75761-15/482524090_18362520637131480_7327501121127671174_n.jpg?stp=dst-jpg_e35_p1080x1080_tt6&_nc_cat=106&ig_cache_key=MzU4MTUwMzE2MDM2OTI1NjI0Mw%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6InhwaWRzLjE0NDB4MTgwMC5zZHIuQzMifQ%3D%3D&_nc_ohc=3n3k9cdBD4UQ7kNvwG1P-Wi&_nc_oc=AdoTlaWqPyUX0sl8PWqlEwqFVCbrmFGmFP5IgoPCbgtpY1euK_7zrl7Zn5YsVjeAxEiH1yY2oT-ORVVraSuqYY_-&_nc_ad=z-m&_nc_cid=5917&_nc_zt=23&_nc_ht=instagram.fmnl44-1.fna&_nc_gid=IWxK4VwAIwS0Xm9wKxjmaA&_nc_ss=7a32e&oh=00_Af2gvh8h4SE-SjywoxSXUbdUCbIvYmDeIOj7Izd6pLoleg&oe=69D5BBC5",
+    src: 'https://i.imgur.com/N7dSjW0.jpeg',
     accentColor: '#2563eb',
     location: 'Intramuros, Manila',
     camera: 'Sony Powershot SX430 IS',

@@ -55,81 +55,71 @@
 
 
 
-/* ── Curtain Transition ── */
-.curtain-wrapper {
+/* ── CRT power-on transition ── */
+.crt-screen-effect {
+  position: fixed;
+  z-index: 80;
+  inset: 0;
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  opacity: 0.9;
+}
+
+.crt-power-on-content[data-crt-power-on='true'] {
+  pointer-events: none;
+}
+
+.crt-power-overlay {
   position: fixed;
   inset: 0;
   z-index: 100;
-  pointer-events: none;
+  pointer-events: auto;
 }
 
-.curtain-panel {
+.crt-power-blackout {
   position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
   background: #000000;
-}
-
-/* HORIZONTAL CLOSING */
-.curtain-left {
-  top: 0;
-  left: 0;
-  width: 50vw;
-  height: 100vh;
-  transform: translateX(-100%);
-  animation: curtain-slide-in-left 0.8s cubic-bezier(0.76, 0, 0.24, 1) forwards;
-}
-
-.curtain-right {
-  top: 0;
-  right: 0;
-  width: 50vw;
-  height: 100vh;
-  transform: translateX(100%);
-  animation: curtain-slide-in-right 0.8s cubic-bezier(0.76, 0, 0.24, 1) forwards;
-}
-
-@keyframes curtain-slide-in-left {
-  to { transform: translateX(0%); }
-}
-
-@keyframes curtain-slide-in-right {
-  to { transform: translateX(0%); }
-}
-
-/* VERTICAL OPENING */
-.curtain-top-open {
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 50vh;
-  animation: curtain-slide-up 1.2s cubic-bezier(0.76, 0, 0.24, 1) 0.15s forwards;
-}
-
-.curtain-bottom-open {
-  bottom: 0;
-  left: 0;
-  width: 100vw;
-  height: 50vh;
-  animation: curtain-slide-down 1.2s cubic-bezier(0.76, 0, 0.24, 1) 0.15s forwards;
-}
-
-@keyframes curtain-slide-up {
-  from { transform: translateY(0%); }
-  to   { transform: translateY(-100%); }
-}
-
-@keyframes curtain-slide-down {
-  from { transform: translateY(0%); }
-  to   { transform: translateY(100%); }
-}
-
-/* ── Landing page / Board screen ── */
-.landing-screen {
-  opacity: 1;
-  transition: opacity 0.4s ease;
-}
-
-.landing-screen.fading-out {
-  opacity: 0;
   pointer-events: none;
 }
 
+.crt-power-blackout::after {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgb(220 235 255 / 2.5%) 0,
+    rgb(125 160 220 / 0.8%) 8%,
+    transparent 22%
+  );
+  content: '';
+}
+
+.crt-power-beam {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  display: none;
+  height: 3px;
+  background: rgb(248 252 255);
+  box-shadow:
+    0 0 3px 1px rgb(255 255 255 / 100%),
+    0 0 12px 4px rgb(225 239 255 / 92%),
+    0 0 30px 10px rgb(160 200 255 / 62%),
+    0 0 58px 20px rgb(120 170 255 / 28%);
+  transform-origin: center;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crt-power-blackout,
+  .crt-power-beam {
+    display: none !important;
+  }
+}
