@@ -2,8 +2,17 @@
 // VITE_CRT_SCENE_URL in a .env file overrides it; set it to an empty string to
 // turn the CRT frame off entirely.
 const DEFAULT_SCENE_URL = 'https://prod.spline.design/wRMF0apehyFgD0cP/scene.splinecode';
-export const CRT_SCENE_URL: string =
+const CONFIGURED_SCENE_URL: string =
   (import.meta.env.VITE_CRT_SCENE_URL as string | undefined) ?? DEFAULT_SCENE_URL;
+
+/** Dev only: ?crt-scene=<a prod.spline.design export URL> loads that export instead. */
+function devSceneOverride(): string | null {
+  if (!import.meta.env.DEV || typeof window === 'undefined') return null;
+  const url = new URLSearchParams(window.location.search).get('crt-scene');
+  return url && url.startsWith('https://prod.spline.design/') ? url : null;
+}
+
+export const CRT_SCENE_URL: string = devSceneOverride() ?? CONFIGURED_SCENE_URL;
 
 /**
  * True when the visitor should get the CRT frame: a configured scene, a

@@ -145,6 +145,8 @@ export function CrtFrame() {
 
   const handleLoad = useCallback((app: Application) => {
     appRef.current = app;
+    // Dev only: expose the scene for poking at it from the console.
+    if (import.meta.env.DEV) (window as unknown as { __crtApp?: Application }).__crtApp = app;
     camRef.current = app.findObjectByName(CAMERA_NAME) ?? null;
     if (!camRef.current) {
       console.warn(`CRT frame: no camera named "${CAMERA_NAME}" in the scene.`);
@@ -225,15 +227,21 @@ export function CrtFrame() {
       // Screen lights follow the power state: snap off, flicker back on.
       const target = poweredRef.current ? 1 : 0;
       const prev = powerLevel.current;
-      powerLevel.current =
-        target > prev ? Math.min(1, prev + dt * 1.6) : Math.max(0, prev - dt * 7);
+      // Ramp toward the target and hold there (an "else fall" here made a
+      // fully-on light keep dropping and re-warming, i.e. flicker forever).
+      if (target > prev) powerLevel.current = Math.min(1, prev + dt * 1.6);
+      else if (target < prev) powerLevel.current = Math.max(0, prev - dt * 7);
       const level = powerLevel.current;
       if (level > 0 || level !== prev) {
         // Warm-up stutter while powering on, then the same tube flicker the
         // terminal shows (crt-flicker.ts is clock-based, so they stay in sync).
         const warmup = level > 0 && level < 1 && target === 1 ? 0.6 + 0.4 * Math.random() : 1;
         const tube = reduceMotion.matches ? 1 : crtLightFlicker();
-        for (const l of lightsRef.current) l.obj.intensity = l.base * level * warmup * tube;
+        for (const l of lightsRef.current) {
+          const v = l.base * level * warmup * tube;
+          // Only touch the light when its value actually changes.
+          if (Math.abs(l.obj.intensity - v) > 1e-4) l.obj.intensity = v;
+        }
       }
 
       const cam = camRef.current;
