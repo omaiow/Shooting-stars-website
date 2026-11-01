@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { AsciiSpline } from './AsciiSpline';
 import { CrtErrorBoundary } from '@/components/crt/CrtErrorBoundary';
-import { crtFlicker, crtJitter } from '@/components/crt/crt-flicker';
+import { crtFlicker, crtJitter, setSteadyLight } from '@/components/crt/crt-flicker';
 import { DESIGN_WORK, LINKS, PHOTO_WORK, TOOLS, VIDEOS } from '@/data/portfolio';
 import type { FocusCard } from '@/components/ui/focus-cards';
 import './terminal.css';
@@ -234,6 +234,14 @@ export function TerminalSite() {
         case 'echo':
           out.push({ kind: 'text', text: text.slice(5) });
           break;
+        case 'steady':
+          setSteadyLight(true);
+          out.push({ kind: 'text', text: 'Tube stabilised. Type FLICKER to undo.', tone: 'dim' });
+          break;
+        case 'flicker':
+          setSteadyLight(false);
+          out.push({ kind: 'text', text: 'Flicker restored.', tone: 'dim' });
+          break;
         case 'sudo':
           out.push({ kind: 'text', text: 'Nice try.', tone: 'amber' });
           break;
@@ -388,12 +396,13 @@ function Help() {
     ['ABOUT', 'Who is Omai'],
     ['TOOLS', 'Installed programs'],
     ['CONTACT', 'Email and socials'],
+    ['STEADY / FLICKER', 'Hold the picture steady, or let it flicker'],
     ['CLS', 'Clear the screen'],
     ['GUI', 'Switch to the full graphical site'],
   ];
   return (
     <div className="tty-block">
-      <div className="tty-table" style={{ gridTemplateColumns: '180px 1fr' }}>
+      <div className="tty-table" style={{ gridTemplateColumns: '240px 1fr' }}>
         {rows.map(([c, d]) => (
           <div key={c} className="tty-row">
             <span className="tty-hot">{c}</span>

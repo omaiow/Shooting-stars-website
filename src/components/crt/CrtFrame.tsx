@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Spline from '@splinetool/react-spline';
 import type { Application, SPEObject } from '@splinetool/runtime';
 import { CRT_SCENE_URL } from './crt-config';
-import { crtFlicker } from './crt-flicker';
+import { crtFlicker, setSteadyLight, useSteadyLight } from './crt-flicker';
 import {
   orbitPose,
   project,
@@ -109,6 +109,7 @@ export function CrtFrame() {
   // The set starts switched off; the opening shot turns it on.
   const [powered, setPowered] = useState(false);
   const [introDone, setIntroDone] = useState(false);
+  const steadyLight = useSteadyLight();
   const intro = useRef<{ start: number | null; done: boolean }>({ start: null, done: false });
   const darknessRef = useRef<HTMLDivElement>(null);
   const powerOnRef = useRef<() => void>(() => {});
@@ -463,6 +464,14 @@ export function CrtFrame() {
         </button>
         <button type="button" onClick={toggleZoom} onPointerDown={(e) => e.stopPropagation()}>
           Zoom screen
+        </button>
+        <button
+          type="button"
+          aria-pressed={steadyLight}
+          onClick={() => setSteadyLight(!steadyLight)}
+          onPointerDown={(e) => e.stopPropagation()}
+        >
+          Light: {steadyLight ? 'steady' : 'flicker'}
         </button>
         <a href="/?screen" onPointerDown={(e) => e.stopPropagation()}>
           Full screen ↗
