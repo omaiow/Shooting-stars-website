@@ -32,6 +32,27 @@ export function shouldUseCrtFrame(): boolean {
 }
 
 /**
+ * How this visit should look:
+ *   frame — the 3D computer with the site on its screen (big screens + mouse)
+ *   dive  — phones/tablets: the 3D opening plays, the camera dives into the
+ *           glass, and the terminal takes over the whole screen
+ *   site  — the original site (?screen, or a small desktop window)
+ * ?crt forces frame, ?crt-dive forces dive.
+ */
+export type CrtMode = 'frame' | 'dive' | 'site';
+
+export function crtMode(): CrtMode {
+  if (typeof window === 'undefined') return 'site';
+  const params = new URLSearchParams(window.location.search);
+  if (params.has('screen') || window.self !== window.top) return 'site';
+  if (params.has('crt-dive')) return 'dive';
+  if (shouldUseCrtFrame()) return 'frame';
+  const touch = !window.matchMedia('(pointer: fine)').matches;
+  const narrow = window.matchMedia('(max-width: 767px)').matches;
+  return touch || narrow ? 'dive' : 'site';
+}
+
+/**
  * The CRT scene is exported for WebGPU. Resolves false when the browser can't
  * give us a WebGPU adapter (older browsers, or a crashed / blocked GPU), so
  * the site can drop back to the plain version instead of an empty frame.

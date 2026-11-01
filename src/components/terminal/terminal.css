@@ -350,3 +350,217 @@
   cursor: none;
   outline: none;
 }
+
+.tty-game canvas {
+  touch-action: none; /* finger drags steer the game instead of scrolling */
+}
+
+/* ── Phones ──────────────────────────────────────────────────────────── */
+
+/* Notches and home bars */
+.tty-bar {
+  padding-top: max(4px, env(safe-area-inset-top));
+  padding-left: max(18px, env(safe-area-inset-left));
+  padding-right: max(18px, env(safe-area-inset-right));
+}
+
+.tty-bar > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tty-bar > span:last-child {
+  flex: none; /* the clock always shows; the title gives way */
+}
+
+.tty-keys {
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+}
+
+/* Touch screens: bigger targets */
+@media (pointer: coarse) {
+  .tty-keyhint {
+    display: none;
+  }
+
+  .tty-key,
+  .tty-menu button,
+  .tty-window-title button,
+  .tty-window-nav button {
+    min-height: 44px;
+  }
+
+  .tty-row > span {
+    padding: 6px 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .tty {
+    font-size: 20px;
+  }
+
+  .tty-screen {
+    padding: 12px 14px 20px;
+  }
+
+  .tty-bar {
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
+  }
+
+  /* One swipeable row of keys instead of four stacked rows */
+  .tty-keys {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 0 16px;
+    padding: 6px 12px max(8px, env(safe-area-inset-bottom));
+    scrollbar-width: none;
+  }
+
+  .tty-keys::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tty-key {
+    flex: none;
+    white-space: nowrap;
+  }
+
+  .tty-hero {
+    height: 220px;
+    margin: 4px -14px 8px;
+  }
+
+  pre.tty-line {
+    white-space: pre;
+    overflow: hidden;
+    font-size: 15px;
+  }
+
+  .tty-menu {
+    gap: 4px 18px;
+  }
+
+  /* Listings: each entry becomes a wrapped line instead of a wide table */
+  .tty-table {
+    display: block;
+  }
+
+  .tty-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 12px;
+    width: 100%;
+    padding: 4px 0;
+    border-bottom: 1px dashed var(--tty-faint);
+  }
+
+  .tty-row > span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .tty-thumbs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  /* Tools: name and years on one line, the bar underneath */
+  .tty-bars {
+    grid-template-columns: 1fr auto;
+    grid-auto-flow: row dense;
+    gap: 0 12px;
+  }
+
+  .tty-bars > div > span[aria-hidden='true'] {
+    grid-column: 1 / -1;
+    margin-bottom: 6px;
+    font-size: 14px;
+    line-height: 1;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  /* Picture viewer and game windows use the whole screen */
+  .tty-window-backdrop {
+    padding: max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom));
+    align-items: stretch;
+  }
+
+  .tty-window {
+    border-width: 3px;
+  }
+
+  .tty-window-title {
+    align-items: center;
+  }
+
+  .tty-window-title > span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .tty-window-body {
+    flex-direction: column;
+    gap: 14px;
+    padding: 12px;
+  }
+
+  .tty-window-body img {
+    width: 100%;
+    max-height: 48vh;
+  }
+
+  .tty-window-text h2 {
+    font-size: 30px;
+  }
+
+  .tty-window-nav {
+    gap: 8px;
+  }
+
+  .tty-game {
+    align-self: center;
+  }
+
+  .tty-game canvas {
+    max-height: none;
+  }
+}
+
+/* On-screen game buttons (touch screens) */
+.tty-pad {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px;
+  border-top: 1px solid var(--tty-faint);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.tty .tty-pad-key {
+  min-width: 64px;
+  min-height: 56px;
+  border: 2px solid var(--tty-fg);
+  font-size: 30px;
+  line-height: 1;
+}
+
+.tty .tty-pad-key:active {
+  background: var(--tty-fg);
+  color: var(--tty-bg);
+  text-shadow: none;
+}
+
+.tty .tty-pad-wide {
+  min-width: 96px;
+  font-size: 24px;
+}

@@ -24,7 +24,7 @@ const ToolRow = memo(function ToolRow({ tool, index }: { tool: typeof TOOLS[0]; 
   return (
     <div
       ref={ref}
-      className="flex items-center gap-6 py-6 border-b border-white/5 group"
+      className="flex items-center gap-3 md:gap-6 py-5 md:py-6 border-b border-white/5 group"
       style={{
         opacity: visible ? 1 : 0,
         transform: visible ? 'translateY(0)' : 'translateY(20px)',
@@ -32,7 +32,7 @@ const ToolRow = memo(function ToolRow({ tool, index }: { tool: typeof TOOLS[0]; 
       }}
     >
       <span
-        className="text-3xl md:text-4xl font-black tracking-tight w-64 flex-shrink-0 transition-colors duration-500"
+        className="text-2xl md:text-4xl font-black tracking-tight w-44 md:w-64 flex-shrink-0 transition-colors duration-500"
         style={{ color: visible ? tool.color : '#1f2937' }}
       >
         {tool.name}
@@ -50,7 +50,7 @@ const ToolRow = memo(function ToolRow({ tool, index }: { tool: typeof TOOLS[0]; 
       </div>
 
       <span
-        className="text-sm font-mono flex-shrink-0 w-20 text-right transition-colors duration-500"
+        className="text-xs md:text-sm font-mono flex-shrink-0 w-16 md:w-20 text-right transition-colors duration-500"
         style={{ color: visible ? 'rgba(255,255,255,0.4)' : 'transparent' }}
       >
         {tool.years}

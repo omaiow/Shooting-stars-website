@@ -436,6 +436,83 @@ function drawStatus(ctx: CanvasRenderingContext2D, status: ArcadeState['status']
   void now;
 }
 
+/* ── Touch controls ─────────────────────────────────────────────────────
+ * Phones have no arrow keys, so these buttons press the same keys the
+ * keyboard would (held buttons stay held; Tetris moves repeat while held).
+ */
+
+const TOUCH =
+  typeof window !== 'undefined' && !window.matchMedia('(pointer: fine)').matches;
+
+type PadButton = { label: string; key: string; repeat?: boolean; wide?: boolean };
+
+const PADS: Partial<Record<ArcadeKind, PadButton[]>> = {
+  tetris: [
+    { label: '◀', key: 'ArrowLeft', repeat: true },
+    { label: '▶', key: 'ArrowRight', repeat: true },
+    { label: '↻', key: 'ArrowUp' },
+    { label: '▼', key: 'ArrowDown', repeat: true },
+    { label: 'DROP', key: ' ', wide: true },
+    { label: 'HOLD', key: 'c', wide: true },
+  ],
+  invaders: [
+    { label: '◀', key: 'ArrowLeft' },
+    { label: '▶', key: 'ArrowRight' },
+    { label: 'FIRE', key: ' ', wide: true },
+  ],
+};
+
+const press = (key: string, type: 'keydown' | 'keyup', repeat = false) =>
+  window.dispatchEvent(new KeyboardEvent(type, { key, repeat, bubbles: true }));
+
+function TouchPad({ buttons }: { buttons: PadButton[] }) {
+  return (
+    <div className="tty-pad">
+      {buttons.map((b) => (
+        <PadKey key={b.label} button={b} />
+      ))}
+    </div>
+  );
+}
+
+function PadKey({ button }: { button: PadButton }) {
+  const timers = useRef<number[]>([]);
+  const held = useRef(false);
+  const release = () => {
+    timers.current.forEach((t) => window.clearTimeout(t));
+    timers.current.forEach((t) => window.clearInterval(t));
+    timers.current = [];
+    if (held.current) press(button.key, 'keyup');
+    held.current = false;
+  };
+  useEffect(() => release, []); // eslint-disable-line react-hooks/exhaustive-deps
+  return (
+    <button
+      type="button"
+      className={`tty-pad-key${button.wide ? ' tty-pad-wide' : ''}`}
+      aria-label={button.label === '↻' ? 'Rotate' : button.label}
+      onPointerDown={(e) => {
+        e.preventDefault();
+        e.currentTarget.setPointerCapture(e.pointerId);
+        held.current = true;
+        press(button.key, 'keydown');
+        if (button.repeat) {
+          timers.current.push(
+            window.setTimeout(() => {
+              timers.current.push(window.setInterval(() => press(button.key, 'keydown', true), 90));
+            }, 260),
+          );
+        }
+      }}
+      onPointerUp={release}
+      onPointerCancel={release}
+      onContextMenu={(e) => e.preventDefault()}
+    >
+      {button.label}
+    </button>
+  );
+}
+
 export function Arcade({ kind, onClose }: { kind: ArcadeKind; onClose: (score: number) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef<ArcadeState>(createState(kind));
@@ -584,6 +661,7 @@ export function Arcade({ kind, onClose }: { kind: ArcadeKind; onClose: (score: n
           <button type="button" onClick={() => onCloseRef.current(stateRef.current.score)} aria-label="Close">[X]</button>
         </div>
         <canvas ref={canvasRef} width={W} height={H} tabIndex={-1} />
+        {TOUCH && PADS[kind] && <TouchPad buttons={PADS[kind]} />}
         <div className="tty-window-nav">
           <span className="tty-dim">{controls[kind]}</span>
           <span className="tty-dim">ESC QUIT</span>

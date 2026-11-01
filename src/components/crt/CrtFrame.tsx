@@ -48,6 +48,13 @@ const POWER_LED_NAME = 'PC Power LED';
 /** Opening shot: start far off in the dark, glide in, then power on. */
 const INTRO = { distance: 2600, yaw: -0.22, pitch: 0.2, ms: 3200, fadeMs: 1600 };
 const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
+/**
+ * Phones ("dive"): frame the whole computer on a narrow screen, then fall
+ * into the glass. CASE_HALF_WIDTH is half the computer's width, with margin.
+ */
+const CASE_HALF_WIDTH = 300;
+const DIVE = { holdMs: 250, ms: 1150, loadTimeoutMs: 9000 };
+const GLASS_CENTER = { x: (GLASS.left + GLASS.right) / 2, y: (GLASS.top + GLASS.bottom) / 2, z: GLASS.z };
 /** How long the switch-off collapse plays before the site is unloaded (ms). */
 const POWER_OFF_MS = 650;
 
@@ -100,7 +107,19 @@ function insideQuad(p: Vec2, q: Vec2[]): boolean {
   return true;
 }
 
-export function CrtFrame() {
+export function CrtFrame({ onDiveEnd }: { onDiveEnd?: () => void } = {}) {
+  /** Phone mode: no orbit or controls; the opening ends by diving into the screen. */
+  const diving = onDiveEnd != null;
+  const onDiveEndRef = useRef(onDiveEnd);
+  useEffect(() => {
+    onDiveEndRef.current = onDiveEnd;
+  }, [onDiveEnd]);
+  const dive = useRef<{ start: number | null; ended: boolean }>({ start: null, ended: false });
+  const endDive = useCallback(() => {
+    if (dive.current.ended) return;
+    dive.current.ended = true;
+    onDiveEndRef.current?.();
+  }, []);
   const stageRef = useRef<HTMLDivElement>(null);
   const planeRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<Application | null>(null);
@@ -172,12 +191,22 @@ export function CrtFrame() {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       intro.current.done = true;
       setIntroDone(true);
-      powerOnRef.current();
+      if (onDiveEndRef.current) endDive();
+      else powerOnRef.current();
     } else {
       intro.current.start = performance.now();
     }
     setSceneReady(true);
-  }, []);
+  }, [endDive]);
+
+  // Phones: if the 3D scene is slow to arrive, don't keep them waiting.
+  useEffect(() => {
+    if (!diving) return;
+    const t = window.setTimeout(() => {
+      if (!appRef.current) endDive();
+    }, DIVE.loadTimeoutMs);
+    return () => window.clearTimeout(t);
+  }, [diving, endDive]);
 
   // Per-frame loop: spring physics → camera pose → site plane transform.
   useEffect(() => {
@@ -216,6 +245,16 @@ export function CrtFrame() {
         m.pitch,
       );
 
+      // Phones: back off far enough that the whole computer fits the width.
+      const stageEl = stageRef.current;
+      const aspect = stageEl ? stageEl.clientWidth / Math.max(1, stageEl.clientHeight) : 1;
+      const tanV = Math.tan((CAMERA_FOV * Math.PI) / 360);
+      const tanH = tanV * aspect;
+      const wideDistance = onDiveEndRef.current
+        ? Math.max(VIEW_WIDE.distance, CASE_HALF_WIDTH / tanH)
+        : VIEW_WIDE.distance;
+      if (onDiveEndRef.current) pose = orbitPose(VIEW_WIDE.target, wideDistance, 0, 0);
+
       // Opening shot: out of the darkness, glide in onto the monitor, then power on.
       const it = intro.current;
       if (!it.done && it.start != null) {
@@ -223,7 +262,7 @@ export function CrtFrame() {
         const e = easeInOutCubic(t);
         pose = orbitPose(
           VIEW_WIDE.target,
-          lerp(INTRO.distance, VIEW_WIDE.distance, e),
+          lerp(Math.max(INTRO.distance, wideDistance * 1.6), wideDistance, e),
           lerp(INTRO.yaw, 0, e),
           lerp(INTRO.pitch, 0, e),
         );
@@ -233,8 +272,21 @@ export function CrtFrame() {
           it.done = true;
           if (dark) dark.style.opacity = '0';
           setIntroDone(true);
-          powerOnRef.current();
+          if (onDiveEndRef.current) dive.current.start = now;
+          else powerOnRef.current();
         }
+      }
+
+      // Phones: fall into the glass until it covers the whole screen.
+      const dv = dive.current;
+      if (dv.start != null) {
+        const k = clamp((now - dv.start - DIVE.holdMs) / DIVE.ms, 0, 1);
+        const e = k * k * k; // accelerate in
+        const glassHalfH = (GLASS.top - GLASS.bottom) / 2;
+        const glassHalfW = (GLASS.right - GLASS.left) / 2;
+        const close = 0.9 * Math.min(glassHalfH / tanV, glassHalfW / tanH);
+        pose = orbitPose(lerp3(VIEW_WIDE.target, GLASS_CENTER, e), lerp(wideDistance, close, e), 0, 0);
+        if (k >= 1) endDive();
       }
 
       // Screen lights follow the power state: snap off, flicker back on.
@@ -309,7 +361,7 @@ export function CrtFrame() {
 
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, []);
+  }, [endDive]);
 
   useEffect(
     () => () => {
@@ -389,6 +441,10 @@ export function CrtFrame() {
 
   // Drag-to-orbit on everything except the screen (the iframe eats its own events).
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (diving) {
+      endDive(); // a tap skips straight to the terminal
+      return;
+    }
     if (e.button !== 0) return;
     if (skipIntro()) return;
     if (overPowerButton(e.clientX, e.clientY)) {
@@ -429,6 +485,7 @@ export function CrtFrame() {
     }
   };
   const onWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    if (diving) return;
     const m = motion.current;
     const notch = Math.round(m.zoomTarget * 10);
     m.zoomTarget = clamp(m.zoomTarget - e.deltaY * 0.0015, 0, 1);
@@ -437,6 +494,7 @@ export function CrtFrame() {
     setShowHint(false);
   };
   const toggleZoom = () => {
+    if (diving) return;
     const m = motion.current;
     m.zoomTarget = m.zoomTarget > 0.5 ? 0 : 1;
     sfx(m.zoomTarget ? 'whooshIn' : 'whooshOut');
@@ -518,7 +576,7 @@ export function CrtFrame() {
         <div className="crt-glass-overlay" aria-hidden="true" />
       </div>
 
-      <div className="crt-controls">
+      <div className="crt-controls" style={diving ? { display: 'none' } : undefined}>
         <button
           type="button"
           aria-pressed={powered && !switchingOff}
@@ -577,7 +635,7 @@ export function CrtFrame() {
         />
       )}
 
-      {showHint && introDone && (
+      {showHint && introDone && !diving && (
         <div className="crt-hint" aria-hidden="true">
           Drag to look around · scroll to zoom
         </div>

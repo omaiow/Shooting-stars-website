@@ -2,6 +2,7 @@ import { useRef, useCallback } from 'react';
 import { motion, useSpring, useTransform, useMotionValue } from 'motion/react';
 import Spline from '@splinetool/react-spline';
 import { scrollToSection } from '@/lib/scroll';
+import { CrtErrorBoundary } from '@/components/crt/CrtErrorBoundary';
 
 const SUBTITLE = "Graphic Designer · UI/UX Designer · Video Editor · Creative Lead";
 
@@ -39,15 +40,18 @@ export function Hero() {
       onMouseLeave={handleMouseLeave}
     >
       <div className="absolute inset-0 z-0">
-        <Spline
-          className="h-full w-full"
-          scene="/assets/hero.splinecode"
-        />
+        {/* If the 3D scene can't load, keep the rest of the page instead of a blank screen */}
+        <CrtErrorBoundary fallback={null}>
+          <Spline
+            className="h-full w-full"
+            scene="/assets/hero.splinecode"
+          />
+        </CrtErrorBoundary>
       </div>
 
       {/* Main content with parallax */}
       <motion.div
-        className="relative z-10 top-[clamp(15rem,40vh,22rem)] text-center max-w-5xl px-4"
+        className="relative z-10 top-[clamp(8rem,24svh,22rem)] md:top-[clamp(15rem,40vh,22rem)] text-center max-w-5xl px-4"
         style={{ x: headingX, y: headingY }}
       >
         <p className="text-white text-lg md:text-xl tracking-wide">
@@ -55,7 +59,7 @@ export function Hero() {
         </p>
 
         {/* CTA row */}
-        <div className="flex items-center justify-center gap-4 mt-10">
+        <div className="flex flex-wrap items-center justify-center gap-3 md:gap-4 mt-8 md:mt-10">
           <a
             href="#work"
             onClick={(e) => { e.preventDefault(); scrollToSection('#work'); }}
@@ -74,7 +78,7 @@ export function Hero() {
       </motion.div>
 
       {/* Bottom — label + scroll */}
-      <div className="absolute bottom-8 left-0 right-0 flex items-center justify-between px-8 z-10">
+      <div className="absolute bottom-8 left-0 right-0 hidden md:flex items-center justify-between px-8 z-10">
         <span className="text-neutral-600 text-xs tracking-widest uppercase">2026</span>
         <div className="flex flex-col items-center gap-2">
           <span className="text-neutral-600 text-xs tracking-widest">Scroll</span>

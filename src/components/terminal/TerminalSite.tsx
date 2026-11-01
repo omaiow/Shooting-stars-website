@@ -54,11 +54,18 @@ const BOOT: { text: string; tone?: 'dim' | 'hot' | 'amber' }[] = [
   { text: '' },
 ];
 
+/** Phones/tablets: don't pop the on-screen keyboard unless they tap the prompt. */
+const TOUCH =
+  typeof window !== 'undefined' && !window.matchMedia('(pointer: fine)').matches;
+
 const MOTD: { text: string; tone?: 'dim' | 'hot' | 'amber' }[] = [
   { text: 'SHAUN SIA — OMAI', tone: 'hot' },
   { text: 'Graphic Designer · UI/UX Designer · Video Editor · Creative Lead' },
   { text: '' },
-  { text: 'Pick a program below, press 1-6, or type HELP.', tone: 'dim' },
+  {
+    text: TOUCH ? 'Tap a program below, or type HELP.' : 'Pick a program below, press 1-6, or type HELP.',
+    tone: 'dim',
+  },
 ];
 
 // Shown if the 3D hero can't run (no WebGL/WebGPU).
@@ -218,7 +225,7 @@ export function TerminalSite() {
   }, [entries, booted]);
 
   useEffect(() => {
-    if (booted && !viewer && !game) inputRef.current?.focus({ preventScroll: true });
+    if (booted && !viewer && !game && !TOUCH) inputRef.current?.focus({ preventScroll: true });
   }, [booted, viewer, game]);
 
   const openGallery = useCallback((which: Gallery, index: number) => {
@@ -388,7 +395,7 @@ export function TerminalSite() {
   return (
     <div className="tty" onClick={(ev) => {
       // Clicking empty terminal space returns focus to the prompt (not when selecting text).
-      if (!viewer && !game && booted && (ev.target as HTMLElement).closest('button, a, input') == null &&
+      if (!TOUCH && !viewer && !game && booted && (ev.target as HTMLElement).closest('button, a, input') == null &&
           !window.getSelection()?.toString()) {
         inputRef.current?.focus({ preventScroll: true });
       }
@@ -754,7 +761,8 @@ function Viewer({
             ◀ PREV
           </button>
           <span className="tty-dim">
-            {index + 1} / {items.length} · ← → · ESC
+            {index + 1} / {items.length}
+            <span className="tty-keyhint"> · ← → · ESC</span>
           </span>
           <button type="button" onClick={() => onNav(1)}>
             NEXT ▶
