@@ -14,19 +14,31 @@
 import { useSyncExternalStore } from 'react';
 
 const VOLUME = 0.55;
+/**
+ * Schedule effects this far ahead. The audio clock the page reads can lag
+ * the sound card by a buffer (10–40 ms on Windows / Bluetooth), and a short
+ * sound scheduled "in the past" gets cut off or plays silently.
+ */
+const LEAD = 0.04;
 
 interface CrtAudio {
-  ctx: AudioContext;
+  ctx: BaseAudioContext;
   master: GainNode;
   noise: AudioBuffer;
   /** A click or key press has happened, so the context is (about to be) running. */
   unlocked: boolean;
   hum: { gain: GainNode; nodes: AudioScheduledSourceNode[] } | null;
+  /** Pre-rendered key clicks: played instantly, no scheduling to miss. */
+  keys?: { key: AudioBuffer[]; enter: AudioBuffer[] } | 'building';
 }
+
+/** The live (real-time) context, for resume(). */
+const realtime = (a: CrtAudio) => a.ctx as AudioContext;
 
 type AudioHost = Window & {
   __crtAudio?: CrtAudio;
   AudioContext?: typeof AudioContext;
+  OfflineAudioContext?: typeof OfflineAudioContext;
   webkitAudioContext?: typeof AudioContext;
 };
 
@@ -80,7 +92,8 @@ function unlock() {
   const a = audio();
   if (!a) return;
   a.unlocked = true;
-  if (a.ctx.state === 'suspended') a.ctx.resume().catch(() => {});
+  if (a.ctx.state === 'suspended') realtime(a).resume().catch(() => {});
+  if (!a.keys) buildKeys(a);
 }
 
 if (typeof window !== 'undefined') {
@@ -230,7 +243,7 @@ export const crtSound = {
   powerOn() {
     const a = live();
     if (!a) return;
-    const t = a.ctx.currentTime + 0.01;
+    const t = a.ctx.currentTime + LEAD;
     switchClick(a, t);
 
     // Degauss: a loud mains-frequency buzz that rattles and dies away.
@@ -259,7 +272,7 @@ export const crtSound = {
     crtSound.stopHum(0.25);
     const a = live();
     if (!a) return;
-    const t = a.ctx.currentTime + 0.01;
+    const t = a.ctx.currentTime + LEAD;
     switchClick(a, t);
     tone(a, t + 0.02, { freq: 15000, to: 2500, peak: 0.03, decay: 0.4 });
     tone(a, t + 0.03, { freq: 90, to: 28, peak: 0.35, decay: 0.35 });
@@ -319,7 +332,7 @@ export const crtSound = {
   crackle() {
     const a = live();
     if (!a || !a.hum) return;
-    const t = a.ctx.currentTime;
+    const t = a.ctx.currentTime + LEAD;
     noise(a, t, { freq: 2800, q: 0.8, peak: 0.06, decay: 0.08 });
     tone(a, t, { type: 'sawtooth', freq: 60, peak: 0.05, decay: 0.12, lowpass: 400 });
   },
@@ -328,24 +341,27 @@ export const crtSound = {
   key(kind: 'key' | 'enter' = 'key') {
     const a = live();
     if (!a) return;
-    const now = a.ctx.currentTime;
-    if (now - lastKey < 0.025) return;
+    const now = performance.now();
+    if (now - lastKey < 12) return;
     lastKey = now;
-    const t = now + 0.002;
-    if (kind === 'enter') {
-      noise(a, t, { freq: 1500, q: 1.2, peak: 0.3, attack: 0.001, decay: 0.04 });
-      tone(a, t, { freq: 120, to: 70, peak: 0.25, decay: 0.06 });
-    } else {
-      noise(a, t, { freq: 2200 + Math.random() * 1600, q: 1.4, peak: 0.2, attack: 0.001, decay: 0.022 });
-      tone(a, t, { type: 'triangle', freq: 190 + Math.random() * 50, peak: 0.06, decay: 0.02 });
+    const bank = a.keys;
+    if (bank && bank !== 'building') {
+      const set = kind === 'enter' ? bank.enter : bank.key;
+      const src = a.ctx.createBufferSource();
+      src.buffer = set[Math.floor(Math.random() * set.length)];
+      src.playbackRate.value = 0.94 + Math.random() * 0.12;
+      src.connect(a.master);
+      src.start(); // right now — nothing scheduled that could be missed
+      return;
     }
+    keyClick(a, a.ctx.currentTime + LEAD, kind);
   },
 
   /** PC-speaker beep: `post` = the all-clear at boot, `error` = bad command. */
   beep(kind: 'post' | 'error' = 'post') {
     const a = live();
     if (!a) return;
-    const t = a.ctx.currentTime + 0.01;
+    const t = a.ctx.currentTime + LEAD;
     if (kind === 'post') {
       tone(a, t, { type: 'square', freq: 1000, peak: 0.05, attack: 0.002, decay: 0.14, lowpass: 3500 });
     } else {
@@ -357,7 +373,7 @@ export const crtSound = {
   drives(length = 1.1) {
     const a = live();
     if (!a) return;
-    const t = a.ctx.currentTime + 0.01;
+    const t = a.ctx.currentTime + LEAD;
 
     // Motor whir.
     const motor = a.ctx.createOscillator();
@@ -398,3 +414,39 @@ export const crtSound = {
 };
 
 let lastKey = 0;
+
+/** One key click, synthesised at time `t` into `a`. */
+function keyClick(a: CrtAudio, t: number, kind: 'key' | 'enter') {
+  if (kind === 'enter') {
+    noise(a, t, { freq: 1500, q: 1.2, peak: 0.65, attack: 0.001, decay: 0.045 });
+    tone(a, t, { freq: 120, to: 70, peak: 0.35, decay: 0.06 });
+  } else {
+    noise(a, t, { freq: 2200 + Math.random() * 1600, q: 1.4, peak: 0.55, attack: 0.001, decay: 0.026 });
+    tone(a, t, { type: 'triangle', freq: 190 + Math.random() * 50, peak: 0.14, decay: 0.022 });
+  }
+}
+
+/** Render a handful of key-click variations once, offline. */
+function buildKeys(a: CrtAudio) {
+  const Offline = host().OfflineAudioContext ?? window.OfflineAudioContext;
+  if (!Offline) return;
+  a.keys = 'building';
+  const sr = a.ctx.sampleRate;
+  const render = (kind: 'key' | 'enter') => {
+    const off = new Offline(1, Math.ceil(sr * 0.1), sr);
+    const master = off.createGain();
+    master.connect(off.destination);
+    keyClick({ ctx: off, master, noise: a.noise, unlocked: true, hum: null }, 0.001, kind);
+    return off.startRendering();
+  };
+  Promise.all([
+    Promise.all(Array.from({ length: 6 }, () => render('key'))),
+    Promise.all(Array.from({ length: 2 }, () => render('enter'))),
+  ])
+    .then(([key, enter]) => {
+      a.keys = { key, enter };
+    })
+    .catch(() => {
+      a.keys = undefined;
+    });
+}
