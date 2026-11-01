@@ -2,7 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Spline from '@splinetool/react-spline';
 import type { Application, SPEObject } from '@splinetool/runtime';
 import { CRT_SCENE_URL } from './crt-config';
-import { crtLightFlicker, setSteadyLight, useSteadyLight } from './crt-flicker';
+import { crtFlicker, crtLightFlicker, setSteadyLight, useSteadyLight } from './crt-flicker';
+import { crtSound, setSoundOn, useSoundOn } from './crt-sound';
 import {
   orbitPose,
   project,
@@ -112,6 +113,9 @@ export function CrtFrame() {
   const [powered, setPowered] = useState(false);
   const [introDone, setIntroDone] = useState(false);
   const steadyLight = useSteadyLight();
+  const soundOn = useSoundOn();
+  /** Inside a picture "catch" last frame (for the crackle sound). */
+  const inCatch = useRef(false);
   const intro = useRef<{ start: number | null; done: boolean }>({ start: null, done: false });
   const darknessRef = useRef<HTMLDivElement>(null);
   const powerOnRef = useRef<() => void>(() => {});
@@ -244,6 +248,13 @@ export function CrtFrame() {
         }
       }
 
+      // A little zap of static whenever the picture catches.
+      if (poweredRef.current && level === 1 && !reduceMotion.matches) {
+        const catching = crtFlicker() < 0.9;
+        if (catching && !inCatch.current) crtSound.crackle();
+        inCatch.current = catching;
+      }
+
       const cam = camRef.current;
       if (cam) {
         cam.position.x = pose.position.x;
@@ -291,7 +302,13 @@ export function CrtFrame() {
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  useEffect(() => () => window.clearTimeout(offTimer.current), []);
+  useEffect(
+    () => () => {
+      window.clearTimeout(offTimer.current);
+      crtSound.stopHum(0.1);
+    },
+    [],
+  );
 
   const setPower = useCallback((on: boolean) => {
     if (poweredRef.current === on) return;
@@ -301,6 +318,8 @@ export function CrtFrame() {
     const led = ledLightRef.current;
     if (led) led.obj.intensity = on ? led.base : 0;
     if (on) {
+      crtSound.powerOn();
+      crtSound.startHum();
       // Fresh load: the site plays its own power-on beam again.
       setSwitchingOff(false);
       setSiteReady(false);
@@ -308,6 +327,7 @@ export function CrtFrame() {
       setPowered(true);
       return;
     }
+    crtSound.powerOff();
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     setSwitchingOff(true);
     // Unload the site after the collapse so videos/audio stop too.
@@ -490,6 +510,19 @@ export function CrtFrame() {
           onPointerDown={(e) => e.stopPropagation()}
         >
           Light flicker
+          <span className="crt-switch-track" aria-hidden="true">
+            <span className="crt-switch-thumb" />
+          </span>
+        </button>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={soundOn}
+          className="crt-switch"
+          onClick={() => setSoundOn(!soundOn)}
+          onPointerDown={(e) => e.stopPropagation()}
+        >
+          Sound
           <span className="crt-switch-track" aria-hidden="true">
             <span className="crt-switch-thumb" />
           </span>
