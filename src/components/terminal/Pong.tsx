@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { sfx } from '@/components/crt/crt-sound';
 
 /**
  * Pong — secret program (type PONG). You're the left paddle; the CPU plays at
@@ -363,6 +364,37 @@ export function Pong({
       pressServe();
     };
 
+    // Sounds: compare the game with how it was last frame.
+    const heard = {
+      game: game.current,
+      vx: 0,
+      vy: 0,
+      points: 0,
+      serving: true,
+      joke: null as number | null,
+      tada: false,
+    };
+    const sounds = (g: Game, now: number) => {
+      const points = g.score[0] + g.score[1];
+      if (heard.game === g) {
+        if (heard.serving && !g.serving) sfx('start');
+        else if (!g.serving && Math.sign(g.ball.vx) !== Math.sign(heard.vx)) sfx('paddle');
+        else if (!g.serving && Math.sign(g.ball.vy) !== Math.sign(heard.vy)) sfx('wall');
+        // A CPU win gets the modem joke instead of a jingle.
+        if (points > heard.points && g.winner !== 'CPU') sfx(g.winner === 'YOU' ? 'win' : 'point');
+      }
+      if (g.lossJokeAt != null && g.lossJokeAt !== heard.joke) {
+        sfx('modem');
+        heard.tada = false;
+      }
+      heard.joke = g.lossJokeAt;
+      if (g.lossJokeAt != null && !heard.tada && now - g.lossJokeAt >= LOSS_JOKE_DURATION) {
+        sfx('tada');
+        heard.tada = true;
+      }
+      Object.assign(heard, { game: g, vx: g.ball.vx, vy: g.ball.vy, points, serving: g.serving });
+    };
+
     window.addEventListener('keydown', keyDown);
     window.addEventListener('keyup', keyUp);
     canvas.addEventListener('pointermove', onPointerMove);
@@ -374,6 +406,7 @@ export function Pong({
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
       step(game.current, dt, now);
+      sounds(game.current, now);
       draw(ctx, game.current, now);
       raf = requestAnimationFrame(frame);
     };

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { sfx } from '@/components/crt/crt-sound';
 
 const W = 800;
 const H = 500;
@@ -176,6 +177,70 @@ function lockPiece(state: TetrisState) {
   }
   state.board = remaining;
   spawnNextPiece(state);
+}
+
+/* ── Sounds ─────────────────────────────────────────────────────────────
+ * Worked out by comparing the game with how it was a moment ago, so the
+ * game logic above doesn't need to know about audio.
+ */
+
+type Heard = {
+  status: ArcadeState['status'];
+  score: number;
+  lives: number;
+  vx: number;
+  vy: number;
+  shots: number;
+  enemies: number;
+  lines: number;
+  piece: unknown;
+};
+
+function look(s: ArcadeState): Heard {
+  return {
+    status: s.status,
+    score: s.score,
+    lives: s.kind === 'tetris' ? 0 : s.lives,
+    vx: s.kind === 'breakout' ? s.ball.vx : 0,
+    vy: s.kind === 'breakout' ? s.ball.vy : 0,
+    shots: s.kind === 'invaders' ? s.playerShots.length : 0,
+    enemies: s.kind === 'invaders' ? s.enemies.length : 0,
+    lines: s.kind === 'tetris' ? s.lines : 0,
+    piece: s.kind === 'tetris' ? s.piece : null,
+  };
+}
+
+/** The four descending notes of the invaders' march. */
+const MARCH = [1, 0.891, 0.794, 0.75];
+
+function playChanges(s: ArcadeState, was: Heard) {
+  const now = look(s);
+  if (was.status !== 'playing') {
+    if (now.status === 'playing') sfx('start');
+    return;
+  }
+  if (s.kind === 'breakout') {
+    if (now.lives < was.lives) sfx(now.status === 'over' ? 'lose' : 'life');
+    else if (now.score > was.score) {
+      // Higher rows ring higher.
+      const row = Math.max(0, Math.min(4, Math.round((s.ball.y - 62) / 25)));
+      sfx('brick', { rate: 1 + (4 - row) * 0.12 });
+    } else if (Math.sign(now.vy) !== Math.sign(was.vy)) sfx(s.ball.y > H - 80 ? 'paddle' : 'wall');
+    else if (Math.sign(now.vx) !== Math.sign(was.vx)) sfx('wall');
+  }
+  if (s.kind === 'invaders') {
+    if (now.shots > was.shots) sfx('shoot');
+    if (now.enemies < was.enemies) sfx('boom');
+    if (now.lives < was.lives) sfx('hit');
+    if (now.status === 'over') sfx('lose');
+  }
+  if (s.kind === 'tetris') {
+    const cleared = now.lines - was.lines;
+    if (cleared > 0) sfx(cleared >= 4 ? 'tetris' : 'clear');
+    else if (now.piece !== was.piece) sfx('lock');
+    if (now.status === 'over') sfx('lose');
+  }
+  if (now.status === 'won') sfx('win');
 }
 
 function updateBreakout(state: BreakoutState, keys: Set<string>, dt: number) {
@@ -385,9 +450,18 @@ export function Arcade({ kind, onClose }: { kind: ArcadeKind; onClose: (score: n
     const ctx = canvas?.getContext('2d');
     if (!canvas || !ctx) return;
 
+    let heard = look(stateRef.current);
+    let marchClock = 0;
+    let marchStep = 0;
+
     const onKeyDown = (event: KeyboardEvent) => {
       const key = event.key.toLowerCase();
       const state = stateRef.current;
+      // Tetris moves happen right here, so their sounds do too.
+      const before =
+        state.kind === 'tetris' && state.status === 'playing'
+          ? { piece: state.piece, x: state.piece.x, y: state.piece.y, shape: state.piece.shape, held: state.heldPiece, lines: state.lines }
+          : null;
       if (key === 'escape') {
         onCloseRef.current(state.score);
       } else if (key === ' ' || key === 'enter') {
@@ -410,6 +484,19 @@ export function Arcade({ kind, onClose }: { kind: ArcadeKind; onClose: (score: n
           state.piece.y++;
           state.score += 1;
         }
+      }
+      if (before && state.kind === 'tetris') {
+        const cleared = state.lines - before.lines;
+        if (key === ' ' && state.piece !== before.piece) sfx('hardDrop');
+        if (cleared > 0) sfx(cleared >= 4 ? 'tetris' : 'clear');
+        else if (state.heldPiece !== before.held) sfx('hold');
+        else if (state.piece !== before.piece) {
+          if (key !== ' ') sfx('lock');
+        } else if (state.piece.shape !== before.shape) sfx('rotate');
+        else if (state.piece.x !== before.x) sfx('move');
+        else if (state.piece.y !== before.y) sfx('softDrop');
+        if (state.status === 'over') sfx('lose');
+        heard = look(state);
       }
       keysRef.current.add(key);
       if ([' ', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'shift'].includes(key)) event.preventDefault();
@@ -447,6 +534,16 @@ export function Arcade({ kind, onClose }: { kind: ArcadeKind; onClose: (score: n
             if (collides(state.board, state.piece.shape, state.piece.x, state.piece.y + 1)) lockPiece(state);
             else state.piece.y++;
           }
+        }
+      }
+      playChanges(state, heard);
+      heard = look(state);
+      // The invaders' four-note march speeds up as they thin out.
+      if (state.kind === 'invaders' && state.status === 'playing') {
+        marchClock -= dt;
+        if (marchClock <= 0) {
+          sfx('march', { rate: MARCH[marchStep++ % MARCH.length] });
+          marchClock = 0.15 + 0.75 * (state.enemies.length / 24);
         }
       }
       drawBackground(ctx);

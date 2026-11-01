@@ -5,7 +5,7 @@ import { Pong } from './Pong';
 import { Snake } from './Snake';
 import { CrtErrorBoundary } from '@/components/crt/CrtErrorBoundary';
 import { crtFlicker, crtJitter } from '@/components/crt/crt-flicker';
-import { crtSound } from '@/components/crt/crt-sound';
+import { crtSound, installPointerSounds, sfx } from '@/components/crt/crt-sound';
 import { DESIGN_WORK, LINKS, PHOTO_WORK, TOOLS, VIDEOS } from '@/data/portfolio';
 import type { FocusCard } from '@/components/ui/focus-cards';
 import './terminal.css';
@@ -69,6 +69,12 @@ const FALLBACK_LOGO = [
   '| |_| | |  | |/ ___ \\ | | ',
   ' \\___/|_|  |_/_/   \\_\\___|',
 ].join('\n');
+
+/** Commands that "read from disk" (a little hard-drive chatter when run). */
+const DISK_COMMANDS = new Set([
+  'help', '?', 'video', 'videos', 'tapes', 'design', 'photo', 'photos', 'about', 'whoami', 'type',
+  'tools', 'contact', 'menu', 'pong', 'beast', 'snake', 'breakout', 'tetris', 'invaders', 'spaceinvaders',
+]);
 
 const fileName = (title: string, ext: string) =>
   title.toUpperCase().replace(/[^A-Z0-9]+/g, '_').replace(/^_|_$/g, '') + ext;
@@ -158,6 +164,26 @@ export function TerminalSite() {
     return () => cancelAnimationFrame(raf);
   }, []);
 
+  // Mouse clicks and hover ticks.
+  useEffect(() => installPointerSounds(), []);
+
+  // Windows opening and closing; each picture "scans" in.
+  const lastViewer = useRef(viewer);
+  useEffect(() => {
+    const was = lastViewer.current;
+    lastViewer.current = viewer;
+    if (viewer && !was) sfx('open');
+    if (!viewer && was) sfx('close');
+    if (viewer && (!was || was.index !== viewer.index || was.which !== viewer.which)) sfx('scan');
+  }, [viewer]);
+  const lastGame = useRef(game);
+  useEffect(() => {
+    const was = lastGame.current;
+    lastGame.current = game;
+    if (game && !was) sfx('open');
+    if (!game && was) sfx('close');
+  }, [game]);
+
   // Keyboard clicks for key presses on the terminal (not while a game runs).
   const gameOpen = useRef(false);
   useEffect(() => {
@@ -212,6 +238,7 @@ export function TerminalSite() {
       const [word = '', ...rest] = text.toLowerCase().split(/\s+/);
       const arg = rest.join(' ');
       const n = Number.parseInt(arg, 10);
+      if (DISK_COMMANDS.has(word)) sfx('seek');
 
       switch (word) {
         case '':
@@ -246,6 +273,7 @@ export function TerminalSite() {
           break;
         case 'cls':
         case 'clear':
+          sfx('wipe');
           setEntries([]);
           return;
         case 'menu':
@@ -284,12 +312,17 @@ export function TerminalSite() {
           setGame('invaders');
           break;
         case 'sudo':
+          crtSound.beep('error');
           out.push({ kind: 'text', text: 'Nice try.', tone: 'amber' });
           break;
         case 'gui':
         case 'exit':
           out.push({ kind: 'text', text: 'Starting graphical mode…', tone: 'dim' });
-          (window.top ?? window).location.href = '/?screen';
+          // Switch the tube off (with its sound) before leaving.
+          crtSound.powerOff();
+          window.setTimeout(() => {
+            (window.top ?? window).location.href = '/?screen';
+          }, 450);
           break;
         default:
           crtSound.beep('error');
@@ -649,7 +682,10 @@ function Viewer({
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    closeRef.current?.focus();
+    // Next frame: focusing during the Enter that opened us would turn that
+    // same Enter into a click on [X] and close the viewer straight away.
+    const id = requestAnimationFrame(() => closeRef.current?.focus());
+    return () => cancelAnimationFrame(id);
   }, []);
 
   useEffect(() => {

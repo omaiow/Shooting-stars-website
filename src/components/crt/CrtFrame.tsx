@@ -3,7 +3,7 @@ import Spline from '@splinetool/react-spline';
 import type { Application, SPEObject } from '@splinetool/runtime';
 import { CRT_SCENE_URL } from './crt-config';
 import { crtFlicker, crtLightFlicker, setSteadyLight, useSteadyLight } from './crt-flicker';
-import { crtSound, setSoundOn, useSoundOn } from './crt-sound';
+import { crtSound, installPointerSounds, setSoundOn, sfx, useSoundOn } from './crt-sound';
 import {
   orbitPose,
   project,
@@ -143,6 +143,9 @@ export function CrtFrame() {
     dragging: false,
     lastX: 0,
     lastY: 0,
+    dragDist: 0, // px dragged this time (for the settle sound)
+    prevYaw: 0, // last frame's angles (for the swivel sound)
+    prevPitch: 0,
     zoom: 0, // 0 = whole computer, 1 = screen fills the view
     zoomTarget: 0,
   });
@@ -197,6 +200,12 @@ export function CrtFrame() {
           m.yaw = m.pitch = m.vYaw = m.vPitch = 0;
         }
       }
+      // Plastic swivel, as loud as the monitor is turning fast.
+      const turnSpeed = Math.hypot(m.yaw - m.prevYaw, m.pitch - m.prevPitch) / Math.max(dt, 1e-3);
+      m.prevYaw = m.yaw;
+      m.prevPitch = m.pitch;
+      crtSound.swivel(turnSpeed);
+
       m.zoom += (m.zoomTarget - m.zoom) * Math.min(1, dt * (reduceMotion.matches ? 60 : 6));
 
       const z = easeInOut(clamp(m.zoom, 0, 1));
@@ -306,9 +315,11 @@ export function CrtFrame() {
     () => () => {
       window.clearTimeout(offTimer.current);
       crtSound.stopHum(0.1);
+      crtSound.stopSwivel();
     },
     [],
   );
+  useEffect(() => installPointerSounds(), []);
 
   const setPower = useCallback((on: boolean) => {
     if (poweredRef.current === on) return;
@@ -340,6 +351,16 @@ export function CrtFrame() {
   useEffect(() => {
     powerOnRef.current = () => setPower(true);
   }, [setPower]);
+
+  /** Full screen: switch the monitor off (with its sound) before leaving. */
+  const goFullScreen = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    if (!poweredRef.current) return;
+    e.preventDefault();
+    const href = e.currentTarget.href;
+    setPower(false);
+    window.setTimeout(() => window.location.assign(href), POWER_OFF_MS);
+  };
 
   /** Jump straight to the end of the opening shot. */
   const skipIntro = () => {
@@ -376,6 +397,7 @@ export function CrtFrame() {
     }
     const m = motion.current;
     m.dragging = true;
+    m.dragDist = 0;
     m.lastX = e.clientX;
     m.lastY = e.clientY;
     m.vYaw = m.vPitch = 0;
@@ -392,25 +414,32 @@ export function CrtFrame() {
     const dy = e.clientY - m.lastY;
     m.lastX = e.clientX;
     m.lastY = e.clientY;
+    m.dragDist += Math.abs(dx) + Math.abs(dy);
     // Rubber-band near the limits so it never hits a hard wall.
     const give = (v: number, max: number) => 1 - Math.min(Math.abs(v) / max, 1) ** 2;
     m.yaw = clamp(m.yaw - dx * DRAG_SPEED * give(m.yaw, MAX_YAW), -MAX_YAW, MAX_YAW);
     m.pitch = clamp(m.pitch + dy * DRAG_SPEED * give(m.pitch, MAX_PITCH), -MAX_PITCH, MAX_PITCH);
   };
   const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
-    motion.current.dragging = false;
+    const m = motion.current;
+    if (m.dragging && m.dragDist > 6) sfx('settle');
+    m.dragging = false;
     if (e.currentTarget.hasPointerCapture(e.pointerId)) {
       e.currentTarget.releasePointerCapture(e.pointerId);
     }
   };
   const onWheel = (e: React.WheelEvent<HTMLDivElement>) => {
     const m = motion.current;
+    const notch = Math.round(m.zoomTarget * 10);
     m.zoomTarget = clamp(m.zoomTarget - e.deltaY * 0.0015, 0, 1);
+    // Clicks like a focus knob, one detent per tenth of the zoom.
+    if (Math.round(m.zoomTarget * 10) !== notch) sfx('knob');
     setShowHint(false);
   };
   const toggleZoom = () => {
     const m = motion.current;
     m.zoomTarget = m.zoomTarget > 0.5 ? 0 : 1;
+    sfx(m.zoomTarget ? 'whooshIn' : 'whooshOut');
     setShowHint(false);
   };
 
@@ -506,7 +535,10 @@ export function CrtFrame() {
           role="switch"
           aria-checked={!steadyLight}
           className="crt-switch"
-          onClick={() => setSteadyLight(!steadyLight)}
+          onClick={() => {
+            sfx(steadyLight ? 'toggleOn' : 'toggleOff');
+            setSteadyLight(!steadyLight);
+          }}
           onPointerDown={(e) => e.stopPropagation()}
         >
           Light flicker
@@ -519,7 +551,11 @@ export function CrtFrame() {
           role="switch"
           aria-checked={soundOn}
           className="crt-switch"
-          onClick={() => setSoundOn(!soundOn)}
+          onClick={() => {
+            if (soundOn) sfx('toggleOff'); // before muting, so it's heard
+            setSoundOn(!soundOn);
+            if (!soundOn) sfx('toggleOn');
+          }}
           onPointerDown={(e) => e.stopPropagation()}
         >
           Sound
@@ -527,7 +563,7 @@ export function CrtFrame() {
             <span className="crt-switch-thumb" />
           </span>
         </button>
-        <a href="/?screen" onPointerDown={(e) => e.stopPropagation()}>
+        <a href="/?screen" onPointerDown={(e) => e.stopPropagation()} onClick={goFullScreen}>
           Full screen ↗
         </a>
       </div>

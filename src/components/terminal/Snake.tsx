@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { sfx } from '@/components/crt/crt-sound';
 
 /**
  * Snake — secret program (type SNAKE). Eat to grow, don't hit the walls or
@@ -187,7 +188,11 @@ export function Snake({ onClose }: { onClose: (score: number, best: number) => v
       const d = DIRS[k];
       if (d) {
         if (g.state === 'ready') start();
-        if (game.current.state === 'playing') turn(game.current, d);
+        if (game.current.state === 'playing') {
+          const queued = game.current.queue.length;
+          turn(game.current, d);
+          if (game.current.queue.length > queued) sfx('move');
+        }
       } else if (k === ' ' || k === 'enter') {
         if (g.state !== 'playing') start();
       } else if (k === 'escape') {
@@ -211,6 +216,18 @@ export function Snake({ onClose }: { onClose: (score: number, best: number) => v
       if (game.current.state === 'playing') turn(game.current, d);
     };
 
+    // Sounds: compare the game with how it was last frame.
+    const heard = { game: game.current, state: game.current.state, score: game.current.score };
+    const sounds = (g: Game) => {
+      if (heard.state !== 'playing' && g.state === 'playing') sfx('start');
+      if (heard.game === g && g.score > heard.score) sfx('eat');
+      if (heard.state === 'playing' && g.state === 'dead') {
+        sfx('die');
+        if (g.score > 0 && g.score >= g.best) window.setTimeout(() => sfx('best'), 450);
+      }
+      Object.assign(heard, { game: g, state: g.state, score: g.score });
+    };
+
     window.addEventListener('keydown', onKey);
     canvas.addEventListener('pointerdown', onPointerDown);
     canvas.addEventListener('pointerup', onPointerUp);
@@ -227,6 +244,7 @@ export function Snake({ onClose }: { onClose: (score: number, best: number) => v
         }
       }
       last = now;
+      sounds(g);
       draw(ctx, g, now);
       raf = requestAnimationFrame(frame);
     };
