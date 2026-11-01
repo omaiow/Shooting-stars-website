@@ -38,8 +38,10 @@ const VIEW_WIDE = { target: { x: 900, y: 320, z: 186 }, distance: 820 };
 const VIEW_CLOSE = { target: { x: 900, y: 350, z: 186 }, distance: 420 };
 /** Front face of the 3D power button on the base unit (clickable). */
 const POWER_BUTTON = { left: 1068, right: 1124, bottom: 38, top: 78, z: 228 };
-/** Lights that come from the screen / LED and go dark when the set is off. */
-const SCREEN_LIGHTS = ['Screen Glow', 'Screen Spill Low', 'Recess Warm Bounce', 'Power LED Glow'];
+/** Lights that come from the screen: they flicker with the tube and go dark when off. */
+const SCREEN_LIGHTS = ['Screen Glow', 'Screen Spill Low', 'Recess Warm Bounce'];
+/** The power LED's glow: steady — simply on or off with the power, never flickers. */
+const LED_LIGHT = 'Power LED Glow';
 /** The glowing LED on the power button; hidden while the set is off. */
 const POWER_LED_NAME = 'PC Power LED';
 /** Opening shot: start far off in the dark, glide in, then power on. */
@@ -120,6 +122,7 @@ export function CrtFrame() {
   // Screen lights: their authored intensities, so we can fade them and restore.
   const lightsRef = useRef<{ obj: SPEObject; base: number }[]>([]);
   const ledRef = useRef<SPEObject | null>(null);
+  const ledLightRef = useRef<{ obj: SPEObject; base: number } | null>(null);
   const powerLevel = useRef(0);
   // Last camera pose + stage size, for hit-testing the 3D power button.
   const lastView = useRef<{ pose: CameraPose; W: number; H: number } | null>(null);
@@ -151,6 +154,9 @@ export function CrtFrame() {
       return obj ? [{ obj, base: obj.intensity }] : [];
     });
     ledRef.current = app.findObjectByName(POWER_LED_NAME) ?? null;
+    const ledLight = app.findObjectByName(LED_LIGHT);
+    ledLightRef.current = ledLight ? { obj: ledLight, base: ledLight.intensity } : null;
+    if (ledLight) ledLight.intensity = 0;
     // Start dark: screen lights and LED off until the opening shot powers on.
     for (const l of lightsRef.current) l.obj.intensity = 0;
     if (ledRef.current) ledRef.current.visible = false;
@@ -284,6 +290,8 @@ export function CrtFrame() {
     poweredRef.current = on;
     window.clearTimeout(offTimer.current);
     if (ledRef.current) ledRef.current.visible = on;
+    const led = ledLightRef.current;
+    if (led) led.obj.intensity = on ? led.base : 0;
     if (on) {
       // Fresh load: the site plays its own power-on beam again.
       setSwitchingOff(false);
