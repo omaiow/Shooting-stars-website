@@ -102,14 +102,36 @@ function catchDip(nowMs: number): number {
   return 0;
 }
 
+/** Smooth 0..1 value noise at `hz` changes per second. */
+function smoothNoise(nowMs: number, hz: number, seed: number): number {
+  const x = (nowMs / 1000) * hz;
+  const i = Math.floor(x);
+  const f = x - i;
+  const u = f * f * (3 - 2 * f);
+  return hash(i + seed) * (1 - u) + hash(i + 1 + seed) * u;
+}
+
+/** How unsteady the 3D glow is between catches (fraction of its brightness). */
+const GLOW_WOBBLE = 0.25;
+/** How much deeper the glow dips than the picture on a catch. */
+const GLOW_CATCH_SCALE = 1.5;
+
 /**
- * Light multiplier for the 3D monitor's screen glow: only the occasional
- * catch (no constant shimmer), landing on the same moments as the picture's
- * catches. Returns 1 when the light-flicker switch is off.
+ * Light multiplier for the 3D monitor's screen glow on the case: an uneven,
+ * slow wobble (a few changes per second, no fast buzz) plus a deeper dip on
+ * the same moments as the picture's catches. Returns 1 when the
+ * light-flicker switch is off.
  */
 export function crtLightFlicker(nowMs: number = Date.now()): number {
   if (steady) return 1;
-  return 1 - catchDip(nowMs) * FLICKER_STRENGTH;
+  const { dt, w } = catchPhase(nowMs);
+  // On a catch the glow drops once, for the length of the picture's catch;
+  // otherwise a slow, uneven wobble (≈2 changes a second) reads as an
+  // unsteady tube, not a strobe.
+  const inCatch = dt >= 0 && dt < 125;
+  const depth = (0.16 + 0.08 * hash(w + 0.75)) * GLOW_CATCH_SCALE;
+  const dim = inCatch ? depth : GLOW_WOBBLE * smoothNoise(nowMs, 2, 17.3);
+  return Math.max(0.2, 1 - dim * FLICKER_STRENGTH);
 }
 
 /** Picture brightness multiplier for the terminal (≈0.76 … 1.03 at strength 1). */
