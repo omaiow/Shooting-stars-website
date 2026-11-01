@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { AsciiSpline } from './AsciiSpline';
+import { Pong } from './Pong';
+import { Snake } from './Snake';
 import { CrtErrorBoundary } from '@/components/crt/CrtErrorBoundary';
 import { crtFlicker, crtJitter } from '@/components/crt/crt-flicker';
 import { DESIGN_WORK, LINKS, PHOTO_WORK, TOOLS, VIDEOS } from '@/data/portfolio';
@@ -81,6 +83,7 @@ export function TerminalSite() {
   const [booted, setBooted] = useState(false);
   const [input, setInput] = useState('');
   const [viewer, setViewer] = useState<{ which: Gallery; index: number } | null>(null);
+  const [game, setGame] = useState<'pong' | 'snake' | null>(null);
   const [clock, setClock] = useState(clockNow);
   const nextId = useRef(1);
   const history = useRef<string[]>([]);
@@ -168,8 +171,8 @@ export function TerminalSite() {
   }, [entries, booted]);
 
   useEffect(() => {
-    if (booted && !viewer) inputRef.current?.focus({ preventScroll: true });
-  }, [booted, viewer]);
+    if (booted && !viewer && !game) inputRef.current?.focus({ preventScroll: true });
+  }, [booted, viewer, game]);
 
   const openGallery = useCallback((which: Gallery, index: number) => {
     const items = galleryItems(which);
@@ -233,6 +236,14 @@ export function TerminalSite() {
           break;
         case 'echo':
           out.push({ kind: 'text', text: text.slice(5) });
+          break;
+        case 'pong':
+          out.push({ kind: 'text', text: 'Loading PONG.EXE…', tone: 'dim' });
+          setGame('pong');
+          break;
+        case 'snake':
+          out.push({ kind: 'text', text: 'Loading SNAKE.EXE…', tone: 'dim' });
+          setGame('snake');
           break;
         case 'sudo':
           out.push({ kind: 'text', text: 'Nice try.', tone: 'amber' });
@@ -305,7 +316,7 @@ export function TerminalSite() {
   return (
     <div className="tty" onClick={(ev) => {
       // Clicking empty terminal space returns focus to the prompt (not when selecting text).
-      if (!viewer && booted && (ev.target as HTMLElement).closest('button, a, input') == null &&
+      if (!viewer && !game && booted && (ev.target as HTMLElement).closest('button, a, input') == null &&
           !window.getSelection()?.toString()) {
         inputRef.current?.focus({ preventScroll: true });
       }
@@ -360,6 +371,23 @@ export function TerminalSite() {
           index={viewer.index}
           onNav={(d) => openGallery(viewer.which, viewer.index + d)}
           onClose={() => setViewer(null)}
+        />
+      )}
+
+      {game === 'pong' && (
+        <Pong
+          onClose={([you, cpu]) => {
+            setGame(null);
+            push([{ kind: 'text', text: `PONG.EXE exited. YOU ${you} — CPU ${cpu}`, tone: you > cpu ? 'hot' : 'dim' }]);
+          }}
+        />
+      )}
+      {game === 'snake' && (
+        <Snake
+          onClose={(score, best) => {
+            setGame(null);
+            push([{ kind: 'text', text: `SNAKE.EXE exited. SCORE ${score} · BEST ${best}`, tone: 'dim' }]);
+          }}
         />
       )}
     </div>

@@ -338,3 +338,15 @@
   .tty-window-body img { animation: none; }
   .tty-flicker { display: none; }
 }
+
+/* Secret games (type PONG or SNAKE) */
+.tty-game canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 8 / 5;
+  max-height: calc(100vh - 200px);
+  object-fit: contain;
+  cursor: none;
+  outline: none;
+}
