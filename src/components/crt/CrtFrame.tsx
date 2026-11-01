@@ -475,11 +475,16 @@ export function CrtFrame() {
         </button>
         <button
           type="button"
-          aria-pressed={steadyLight}
+          role="switch"
+          aria-checked={!steadyLight}
+          className="crt-switch"
           onClick={() => setSteadyLight(!steadyLight)}
           onPointerDown={(e) => e.stopPropagation()}
         >
-          Light: {steadyLight ? 'steady' : 'flicker'}
+          Flicker
+          <span className="crt-switch-track" aria-hidden="true">
+            <span className="crt-switch-thumb" />
+          </span>
         </button>
         <a href="/?screen" onPointerDown={(e) => e.stopPropagation()}>
           Full screen ↗

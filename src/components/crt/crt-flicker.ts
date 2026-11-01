@@ -7,7 +7,7 @@
  * each other.
  *
  *   - a 30 Hz shimmer (the tube's refresh noise)
- *   - every couple of seconds a "catch": two quick dips with a small
+ *   - every 6-8 seconds or so a "catch": two quick dips with a small
  *     sideways jolt of the picture
  *
  * Kept under 3 flashes per second (photosensitivity guidance); callers skip
@@ -20,7 +20,7 @@ import { useSyncExternalStore } from 'react';
 export const FLICKER_STRENGTH = 1;
 
 export const FLICKER_HZ = 30;
-const WINDOW_MS = 2600; // one catch per window (some windows skip)
+const WINDOW_MS = 6000; // at most one catch per window (some windows skip)
 const CATCH_MS = 160;
 
 /** Deterministic 0..1 hash of a number. */
@@ -32,7 +32,7 @@ function hash(n: number): number {
 /** Milliseconds into the current catch, or -1 when not in one. */
 function catchPhase(nowMs: number): { dt: number; w: number } {
   const w = Math.floor(nowMs / WINDOW_MS);
-  if (hash(w + 0.5) < 0.1) return { dt: -1, w };
+  if (hash(w + 0.5) < 0.2) return { dt: -1, w };
   // Keep ≥ 500 ms from both window edges so two catches are always ≥ 1 s apart.
   const at = 500 + hash(w + 0.25) * (WINDOW_MS - CATCH_MS - 1000);
   const dt = nowMs - w * WINDOW_MS - at;

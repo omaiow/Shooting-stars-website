@@ -170,6 +170,43 @@
   color: #8dff9a;
 }
 
+/* On/off switch in the CRT controls */
+.crt-controls .crt-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.crt-switch-track {
+  position: relative;
+  width: 34px;
+  height: 18px;
+  border-radius: 9px;
+  border: 1px solid rgb(170 180 165 / 60%);
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+.crt-switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgb(170 180 165);
+  transition: transform 150ms ease, background-color 150ms ease;
+}
+
+.crt-switch[aria-checked='true'] .crt-switch-track {
+  background: rgb(141 255 154 / 18%);
+  border-color: #8dff9a;
+}
+
+.crt-switch[aria-checked='true'] .crt-switch-thumb {
+  transform: translateX(16px);
+  background: #8dff9a;
+}
+
 .crt-hint {
   position: absolute;
   left: 50%;
