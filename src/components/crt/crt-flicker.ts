@@ -39,10 +39,10 @@ function catchPhase(nowMs: number): { dt: number; w: number } {
   return { dt: dt >= 0 && dt < CATCH_MS ? dt : -1, w };
 }
 
-/* ── Steady-light setting ──────────────────────────────────────────────
- * Saved in localStorage so the 3D frame and the terminal (a separate
- * same-origin document in the iframe) share it: changing it in one fires a
- * `storage` event in the other. Remembered between visits.
+/* ── Light-flicker setting (3D monitor lights only) ────────────────────
+ * Whether the Spline scene's screen glow flickers. The terminal's own
+ * picture flicker is not affected. Saved in localStorage so it is
+ * remembered between visits.
  */
 const STEADY_KEY = 'crt-steady-light';
 const listeners = new Set<() => void>();
@@ -90,27 +90,38 @@ export function useSteadyLight(): boolean {
   );
 }
 
-/** Brightness multiplier around 1 (≈0.78 … 1.03 at strength 1). */
-export function crtFlicker(nowMs: number = Date.now()): number {
+/** Dip amount (0 … ~0.24) of the current catch, 0 when not in one. */
+function catchDip(nowMs: number): number {
+  const { dt, w } = catchPhase(nowMs);
+  if (dt < 0) return 0;
+  // drop – recover – drop – recover
+  const depth = 0.16 + 0.08 * hash(w + 0.75);
+  if (dt < 45) return depth;
+  if (dt < 80) return depth * 0.25;
+  if (dt < 125) return depth * 0.8;
+  return 0;
+}
+
+/**
+ * Light multiplier for the 3D monitor's screen glow: only the occasional
+ * catch (no constant shimmer), landing on the same moments as the picture's
+ * catches. Returns 1 when the light-flicker switch is off.
+ */
+export function crtLightFlicker(nowMs: number = Date.now()): number {
   if (steady) return 1;
+  return 1 - catchDip(nowMs) * FLICKER_STRENGTH;
+}
+
+/** Picture brightness multiplier for the terminal (≈0.76 … 1.03 at strength 1). */
+export function crtFlicker(nowMs: number = Date.now()): number {
   const step = Math.floor((nowMs / 1000) * FLICKER_HZ);
   const shimmer = (hash(step) - 0.5) * 0.06;
 
-  const { dt, w } = catchPhase(nowMs);
-  let dip = 0;
-  if (dt >= 0) {
-    // drop – recover – drop – recover
-    const depth = 0.16 + 0.08 * hash(w + 0.75);
-    if (dt < 45) dip = depth;
-    else if (dt < 80) dip = depth * 0.25;
-    else if (dt < 125) dip = depth * 0.8;
-  }
-  return 1 + (shimmer - dip) * FLICKER_STRENGTH;
+  return 1 + (shimmer - catchDip(nowMs)) * FLICKER_STRENGTH;
 }
 
 /** Sideways jolt of the picture in px during a catch (0 otherwise). */
 export function crtJitter(nowMs: number = Date.now()): number {
-  if (steady) return 0;
   const { dt, w } = catchPhase(nowMs);
   if (dt < 0 || dt >= 125) return 0;
   const dir = hash(w + Math.floor(dt / 40)) > 0.5 ? 1 : -1;

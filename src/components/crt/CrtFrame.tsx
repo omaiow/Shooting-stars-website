@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Spline from '@splinetool/react-spline';
 import type { Application, SPEObject } from '@splinetool/runtime';
 import { CRT_SCENE_URL } from './crt-config';
-import { crtFlicker, setSteadyLight, useSteadyLight } from './crt-flicker';
+import { crtLightFlicker, setSteadyLight, useSteadyLight } from './crt-flicker';
 import {
   orbitPose,
   project,
@@ -232,7 +232,7 @@ export function CrtFrame() {
         // Warm-up stutter while powering on, then the same tube flicker the
         // terminal shows (crt-flicker.ts is clock-based, so they stay in sync).
         const warmup = level > 0 && level < 1 && target === 1 ? 0.6 + 0.4 * Math.random() : 1;
-        const tube = reduceMotion.matches ? 1 : crtFlicker();
+        const tube = reduceMotion.matches ? 1 : crtLightFlicker();
         for (const l of lightsRef.current) l.obj.intensity = l.base * level * warmup * tube;
       }
 
@@ -481,7 +481,7 @@ export function CrtFrame() {
           onClick={() => setSteadyLight(!steadyLight)}
           onPointerDown={(e) => e.stopPropagation()}
         >
-          Flicker
+          Light flicker
           <span className="crt-switch-track" aria-hidden="true">
             <span className="crt-switch-thumb" />
           </span>
