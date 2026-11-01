@@ -5,11 +5,15 @@ import { CrtScreenEffect } from './components/ui/crt-screen-effect';
 import { CrtFrame } from './components/crt/CrtFrame';
 import { crtGpuAvailable, shouldUseCrtFrame } from './components/crt/crt-config';
 import { CrtErrorBoundary } from './components/crt/CrtErrorBoundary';
+import { TerminalSite } from './components/terminal/TerminalSite';
 
-// Decided once per page load: big desktop screens get the 3D CRT with the site
-// inside it (the site itself is loaded at /?screen); phones, tablets and
-// /?screen get the site directly, exactly as before.
-const USE_CRT_FRAME = shouldUseCrtFrame();
+// Decided once per page load:
+//   /?tty    → the terminal UI (what the 3D CRT shows on its screen)
+//   /?screen → the original site, full screen
+//   /        → big desktop screens get the 3D CRT; phones/tablets get the original site
+const ROUTE_TTY =
+  typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('tty');
+const USE_CRT_FRAME = !ROUTE_TTY && shouldUseCrtFrame();
 
 function Site() {
   const [transitionActive, setTransitionActive] = useState(true);
@@ -41,6 +45,18 @@ function Site() {
 }
 
 function App() {
+  if (ROUTE_TTY) {
+    return (
+      <>
+        <CrtScreenEffect />
+        <TerminalSite />
+      </>
+    );
+  }
+  return <CrtApp />;
+}
+
+function CrtApp() {
   const [useCrt, setUseCrt] = useState(USE_CRT_FRAME);
 
   // No WebGPU → no CRT scene; show the normal site instead of an empty frame.

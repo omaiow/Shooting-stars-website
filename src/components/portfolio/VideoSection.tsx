@@ -1,9 +1,5 @@
 // Video Work section — embedded YouTube videos
-const VIDEOS = [
-  { id: 'jr6pgriP5W8', title: 'Video Edit #1' },
-  { id: '5MIPImPRnGM', title: 'Video Edit #2' },
-  { id: '7LpBqhtV3y8', title: 'Video Edit #3' },
-];
+import { VIDEOS } from '@/data/portfolio';
 
 export function VideoSection() {
   return (

@@ -14,7 +14,7 @@ export function shouldUseCrtFrame(): boolean {
   if (typeof window === 'undefined') return false;
   if (!CRT_SCENE_URL) return false;
   const params = new URLSearchParams(window.location.search);
-  if (params.has('screen')) return false;
+  if (params.has('screen') || params.has('tty')) return false;
   if (window.self !== window.top) return false;
   if (params.has('crt')) return true;
   const bigEnough = window.matchMedia('(min-width: 1024px) and (min-height: 600px)').matches;

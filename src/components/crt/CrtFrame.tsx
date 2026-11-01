@@ -17,8 +17,8 @@ import {
  * CrtFrame — the 3D retro computer (a Spline scene) with the real website
  * running on its screen.
  *
- * - The site loads in an iframe at `/?screen`, so it keeps its own scrolling,
- *   navbar, breakpoints and effects, and stays fully clickable.
+ * - The screen shows the terminal UI in an iframe at `/?tty`; "Full screen"
+ *   opens the original site at `/?screen`. The iframe stays fully clickable.
  * - Drag anywhere outside the screen to orbit the computer; let go and the
  *   camera springs back to the straight-on view. Scroll (outside the screen)
  *   or double-click to zoom in on the screen.
@@ -376,7 +376,7 @@ export function CrtFrame() {
           {powered && (
             <iframe
               key={iframeKey}
-              src="/?screen"
+              src="/?tty"
               title="Shaun Sia — Omai portfolio"
               onLoad={() => setSiteReady(true)}
               style={{

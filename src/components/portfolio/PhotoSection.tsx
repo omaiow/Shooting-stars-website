@@ -1,59 +1,7 @@
 // Photography section using Aceternity Focus Cards
 // Instagram: @shauncena17
 import { FocusCards } from '../ui/focus-cards';
-import type { FocusCard } from '../ui/focus-cards';
-
-// Photography cards displayed in the portfolio's focus-card gallery.
-const PHOTO_CARDS: FocusCard[] = [
-  {
-    title: 'The Wall',
-    src: 'https://i.imgur.com/N7dSjW0.jpeg',
-    accentColor: '#2563eb',
-    location: 'Intramuros, Manila',
-    camera: 'Sony Powershot SX430 IS',
-    thoughtProcess: 'I was walking around Intramuros and i saw this wall with this window that was so compelling it felt serene and i just had to take a picture.',
-  },
-  {
-    title: 'The City',
-    src: "https://i.imgur.com/ZcF1qCu.jpeg",
-    accentColor: '#2563eb',
-    location: 'Pasig City',
-    camera: 'IPhone 11',
-    thoughtProcess: 'The sharp angles of the architecture caught my eye. It felt suffocating but weirdly calming.',
-  },
-  {
-    title: 'The Train',
-    src: "https://i.imgur.com/6vnFaGc.jpeg",
-    accentColor: '#2563eb',
-    location: 'Dr Santos Station',
-    camera: 'iPhone 11',
-    thoughtProcess: 'I was going on a walk with my friends and we noticed this scene. I thought it would be a great shot. The soft, diffused light coming from the window was perfect.',
-  },
-  {
-    title: 'The Crosswalk',
-    src: "https://i.imgur.com/oVY8kj2.jpeg",
-    accentColor: '#2563eb',
-    location: 'Fort Santiago',
-    camera: 'Sony Powershot SX430 IS',
-    thoughtProcess: 'Street photography is about capturing raw, unfiltered moments. I was walking to Fort Santiago and before i crossed the street a beam of light suddenly hit the sidewalk and an overwhelming feeling of calm washed over me, it was as if everything went silent and all that mattered was that moment. I knew i had to capture this moment.',
-  },
-  {
-    title: 'The Feeling',
-    src: "https://i.imgur.com/02Y4tXT.jpeg",
-    accentColor: '#2563eb',
-    location: 'Smart Araneta Coliseum',
-    camera: 'Sony Powershot SX430 IS',
-    thoughtProcess: 'During the Chromokopia Tyler the Creator concert, I felt so moved by the performance that I had to capture the moment. I used the long exposure to capture the movement of the lights and the crowd.',
-  },
-  {
-    title: 'The Obelisk',
-    src: "https://i.imgur.com/6LgLFZu.jpeg",
-    accentColor: '#2563eb',
-    location: 'Polytechnic University of the Philippines Manila',
-    camera: 'Canon EOS M50 Mark II',
-    thoughtProcess: 'It was a school ecavent and the we were there early to prepare our booth, and i noticed the way the light was hitting the obelisk and it caught my eye.',
-  },
-];
+import { PHOTO_WORK } from '@/data/portfolio';
 
 export function PhotoSection() {
   return (
@@ -77,7 +25,7 @@ export function PhotoSection() {
           </a>
         </div>
 
-        <FocusCards cards={PHOTO_CARDS} />
+        <FocusCards cards={PHOTO_WORK} />
 
         <div className="mt-8 flex flex-wrap gap-2">
           {['Lightroom', 'Photography', 'Color Grading', 'Personal Work'].map(tag => (
