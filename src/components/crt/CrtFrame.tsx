@@ -42,6 +42,9 @@ const POWER_BUTTON = { left: 1068, right: 1124, bottom: 38, top: 78, z: 228 };
 const SCREEN_LIGHTS = ['Screen Glow', 'Screen Spill Low', 'Recess Warm Bounce', 'Power LED Glow'];
 /** The glowing LED on the power button; hidden while the set is off. */
 const POWER_LED_NAME = 'PC Power LED';
+/** Opening shot: start far off in the dark, glide in, then power on. */
+const INTRO = { distance: 2600, yaw: -0.22, pitch: 0.2, ms: 3200, fadeMs: 1600 };
+const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
 /** How long the switch-off collapse plays before the site is unloaded (ms). */
 const POWER_OFF_MS = 650;
 
@@ -103,15 +106,20 @@ export function CrtFrame() {
   const [sceneReady, setSceneReady] = useState(false);
   const [showHint, setShowHint] = useState(true);
   // Power: `powered` mounts the site; `switchingOff` plays the collapse first.
-  const [powered, setPowered] = useState(true);
+  // The set starts switched off; the opening shot turns it on.
+  const [powered, setPowered] = useState(false);
+  const [introDone, setIntroDone] = useState(false);
+  const intro = useRef<{ start: number | null; done: boolean }>({ start: null, done: false });
+  const darknessRef = useRef<HTMLDivElement>(null);
+  const powerOnRef = useRef<() => void>(() => {});
   const [switchingOff, setSwitchingOff] = useState(false);
   const [iframeKey, setIframeKey] = useState(0);
-  const poweredRef = useRef(true);
+  const poweredRef = useRef(false);
   const offTimer = useRef<number | undefined>(undefined);
   // Screen lights: their authored intensities, so we can fade them and restore.
   const lightsRef = useRef<{ obj: SPEObject; base: number }[]>([]);
   const ledRef = useRef<SPEObject | null>(null);
-  const powerLevel = useRef(1);
+  const powerLevel = useRef(0);
   // Last camera pose + stage size, for hit-testing the 3D power button.
   const lastView = useRef<{ pose: CameraPose; W: number; H: number } | null>(null);
   const debug =
@@ -142,6 +150,16 @@ export function CrtFrame() {
       return obj ? [{ obj, base: obj.intensity }] : [];
     });
     ledRef.current = app.findObjectByName(POWER_LED_NAME) ?? null;
+    // Start dark: screen lights and LED off until the opening shot powers on.
+    for (const l of lightsRef.current) l.obj.intensity = 0;
+    if (ledRef.current) ledRef.current.visible = false;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      intro.current.done = true;
+      setIntroDone(true);
+      powerOnRef.current();
+    } else {
+      intro.current.start = performance.now();
+    }
     setSceneReady(true);
   }, []);
 
@@ -169,12 +187,33 @@ export function CrtFrame() {
       m.zoom += (m.zoomTarget - m.zoom) * Math.min(1, dt * (reduceMotion.matches ? 60 : 6));
 
       const z = easeInOut(clamp(m.zoom, 0, 1));
-      const pose = orbitPose(
+      let pose = orbitPose(
         lerp3(VIEW_WIDE.target, VIEW_CLOSE.target, z),
         lerp(VIEW_WIDE.distance, VIEW_CLOSE.distance, z),
         m.yaw,
         m.pitch,
       );
+
+      // Opening shot: out of the darkness, glide in onto the monitor, then power on.
+      const it = intro.current;
+      if (!it.done && it.start != null) {
+        const t = clamp((now - it.start) / INTRO.ms, 0, 1);
+        const e = easeInOutCubic(t);
+        pose = orbitPose(
+          VIEW_WIDE.target,
+          lerp(INTRO.distance, VIEW_WIDE.distance, e),
+          lerp(INTRO.yaw, 0, e),
+          lerp(INTRO.pitch, 0, e),
+        );
+        const dark = darknessRef.current;
+        if (dark) dark.style.opacity = String(1 - easeInOut(clamp((now - it.start) / INTRO.fadeMs, 0, 1)));
+        if (t >= 1) {
+          it.done = true;
+          if (dark) dark.style.opacity = '0';
+          setIntroDone(true);
+          powerOnRef.current();
+        }
+      }
 
       // Screen lights follow the power state: snap off, flicker back on.
       const target = poweredRef.current ? 1 : 0;
@@ -261,6 +300,17 @@ export function CrtFrame() {
     }, reduce ? 0 : POWER_OFF_MS);
   }, []);
   const togglePower = useCallback(() => setPower(!poweredRef.current), [setPower]);
+  useEffect(() => {
+    powerOnRef.current = () => setPower(true);
+  }, [setPower]);
+
+  /** Jump straight to the end of the opening shot. */
+  const skipIntro = () => {
+    const it = intro.current;
+    if (it.done || it.start == null) return false;
+    it.start = performance.now() - INTRO.ms;
+    return true;
+  };
 
   /** Is the pointer over the 3D power button? */
   const overPowerButton = (clientX: number, clientY: number) => {
@@ -282,6 +332,7 @@ export function CrtFrame() {
   // Drag-to-orbit on everything except the screen (the iframe eats its own events).
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0) return;
+    if (skipIntro()) return;
     if (overPowerButton(e.clientX, e.clientY)) {
       togglePower();
       return;
@@ -376,7 +427,9 @@ export function CrtFrame() {
           outline: debug ? '4px solid #ff2e63' : undefined,
         }}
       >
-        <div className={`crt-tube${switchingOff ? ' crt-tube-off' : ''}`}>
+        <div
+          className={`crt-tube${switchingOff ? ' crt-tube-off' : siteReady && powered ? ' crt-tube-on' : ''}`}
+        >
           {powered && (
             <iframe
               key={iframeKey}
@@ -416,7 +469,16 @@ export function CrtFrame() {
         </a>
       </div>
 
-      {showHint && sceneReady && (
+      {/* Opening darkness, faded out by the per-frame loop */}
+      {!introDone && (
+        <div
+          ref={darknessRef}
+          aria-hidden="true"
+          style={{ position: 'absolute', inset: 0, background: '#000', pointerEvents: 'none' }}
+        />
+      )}
+
+      {showHint && introDone && (
         <div className="crt-hint" aria-hidden="true">
           Drag to look around · scroll to zoom
         </div>

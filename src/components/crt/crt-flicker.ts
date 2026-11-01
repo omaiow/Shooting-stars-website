@@ -6,37 +6,58 @@
  * same value at the same moment and flicker in sync without talking to
  * each other.
  *
- * Returns a brightness multiplier around 1:
- *   - a faint 30 Hz shimmer (the tube's refresh noise), ±1.5%
- *   - every few seconds a brief "hiccup" dip of up to ~9%, ~90 ms long
- * Amplitudes stay small on purpose (photosensitivity), and callers skip it
- * entirely for prefers-reduced-motion.
+ *   - a 30 Hz shimmer (the tube's refresh noise)
+ *   - every couple of seconds a "catch": two quick dips with a small
+ *     sideways jolt of the picture
+ *
+ * Kept under 3 flashes per second (photosensitivity guidance); callers skip
+ * it entirely for prefers-reduced-motion. Tune with FLICKER_STRENGTH.
  */
 
-/** Deterministic 0..1 hash of an integer. */
+/** 0 = off, 1 = default, 2 = very obvious. */
+export const FLICKER_STRENGTH = 1;
+
+export const FLICKER_HZ = 30;
+const WINDOW_MS = 2600; // one catch per window (some windows skip)
+const CATCH_MS = 160;
+
+/** Deterministic 0..1 hash of a number. */
 function hash(n: number): number {
   const x = Math.sin(n * 127.1 + 311.7) * 43758.5453;
   return x - Math.floor(x);
 }
 
-export const FLICKER_HZ = 30;
+/** Milliseconds into the current catch, or -1 when not in one. */
+function catchPhase(nowMs: number): { dt: number; w: number } {
+  const w = Math.floor(nowMs / WINDOW_MS);
+  if (hash(w + 0.5) < 0.25) return { dt: -1, w };
+  // Keep ≥ 500 ms from both window edges so two catches are always ≥ 1 s apart.
+  const at = 500 + hash(w + 0.25) * (WINDOW_MS - CATCH_MS - 1000);
+  const dt = nowMs - w * WINDOW_MS - at;
+  return { dt: dt >= 0 && dt < CATCH_MS ? dt : -1, w };
+}
 
+/** Brightness multiplier around 1 (≈0.78 … 1.03 at strength 1). */
 export function crtFlicker(nowMs: number = Date.now()): number {
-  // 30 Hz stepped shimmer
   const step = Math.floor((nowMs / 1000) * FLICKER_HZ);
-  const shimmer = (hash(step) - 0.5) * 0.03;
+  const shimmer = (hash(step) - 0.5) * 0.06;
 
-  // Hiccups: each 4 s window gets one dip at a random moment (some windows skip).
-  const windowMs = 4000;
-  const w = Math.floor(nowMs / windowMs);
+  const { dt, w } = catchPhase(nowMs);
   let dip = 0;
-  if (hash(w + 0.5) > 0.35) {
-    const at = hash(w + 0.25) * (windowMs - 200);
-    const dt = nowMs - w * windowMs - at;
-    if (dt >= 0 && dt < 90) {
-      // two quick drops, like a tube catching
-      dip = (dt < 35 || dt > 60 ? 0.09 : 0.04) * (0.6 + 0.4 * hash(w + 0.75));
-    }
+  if (dt >= 0) {
+    // drop – recover – drop – recover
+    const depth = 0.16 + 0.08 * hash(w + 0.75);
+    if (dt < 45) dip = depth;
+    else if (dt < 80) dip = depth * 0.25;
+    else if (dt < 125) dip = depth * 0.8;
   }
-  return 1 + shimmer - dip;
+  return 1 + (shimmer - dip) * FLICKER_STRENGTH;
+}
+
+/** Sideways jolt of the picture in px during a catch (0 otherwise). */
+export function crtJitter(nowMs: number = Date.now()): number {
+  const { dt, w } = catchPhase(nowMs);
+  if (dt < 0 || dt >= 125) return 0;
+  const dir = hash(w + Math.floor(dt / 40)) > 0.5 ? 1 : -1;
+  return dir * (1 + hash(w + 0.9)) * FLICKER_STRENGTH;
 }

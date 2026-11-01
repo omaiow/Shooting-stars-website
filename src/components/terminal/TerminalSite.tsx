@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { AsciiSpline } from './AsciiSpline';
 import { CrtErrorBoundary } from '@/components/crt/CrtErrorBoundary';
-import { crtFlicker } from '@/components/crt/crt-flicker';
+import { crtFlicker, crtJitter } from '@/components/crt/crt-flicker';
 import { DESIGN_WORK, LINKS, PHOTO_WORK, TOOLS, VIDEOS } from '@/data/portfolio';
 import type { FocusCard } from '@/components/ui/focus-cards';
 import './terminal.css';
@@ -133,7 +133,16 @@ export function TerminalSite() {
     if (!el) return;
     let raf = 0;
     const tick = () => {
-      el.style.opacity = reduce.matches ? '0' : String(Math.max(0, 1 - crtFlicker()));
+      const now = Date.now();
+      const screen = screenRef.current;
+      if (reduce.matches) {
+        el.style.opacity = '0';
+        if (screen) screen.style.transform = '';
+      } else {
+        el.style.opacity = String(Math.max(0, 1 - crtFlicker(now)));
+        const jolt = crtJitter(now);
+        if (screen) screen.style.transform = jolt ? `translateX(${jolt}px)` : '';
+      }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
