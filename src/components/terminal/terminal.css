@@ -324,6 +324,17 @@
   text-shadow: none;
 }
 
+/* Darkening layer driven by the shared flicker signal (crt-flicker.ts) */
+.tty-flicker {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .tty-window-body img { animation: none; }
+  .tty-flicker { display: none; }
 }

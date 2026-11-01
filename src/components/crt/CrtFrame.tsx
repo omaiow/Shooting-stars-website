@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Spline from '@splinetool/react-spline';
 import type { Application, SPEObject } from '@splinetool/runtime';
 import { CRT_SCENE_URL } from './crt-config';
+import { crtFlicker } from './crt-flicker';
 import {
   orbitPose,
   project,
@@ -181,9 +182,12 @@ export function CrtFrame() {
       powerLevel.current =
         target > prev ? Math.min(1, prev + dt * 1.6) : Math.max(0, prev - dt * 7);
       const level = powerLevel.current;
-      if (level !== prev || (level > 0 && level < 1)) {
-        const flicker = level > 0 && level < 1 && target === 1 ? 0.6 + 0.4 * Math.random() : 1;
-        for (const l of lightsRef.current) l.obj.intensity = l.base * level * flicker;
+      if (level > 0 || level !== prev) {
+        // Warm-up stutter while powering on, then the same tube flicker the
+        // terminal shows (crt-flicker.ts is clock-based, so they stay in sync).
+        const warmup = level > 0 && level < 1 && target === 1 ? 0.6 + 0.4 * Math.random() : 1;
+        const tube = reduceMotion.matches ? 1 : crtFlicker();
+        for (const l of lightsRef.current) l.obj.intensity = l.base * level * warmup * tube;
       }
 
       const cam = camRef.current;

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { AsciiSpline } from './AsciiSpline';
 import { CrtErrorBoundary } from '@/components/crt/CrtErrorBoundary';
+import { crtFlicker } from '@/components/crt/crt-flicker';
 import { DESIGN_WORK, LINKS, PHOTO_WORK, TOOLS, VIDEOS } from '@/data/portfolio';
 import type { FocusCard } from '@/components/ui/focus-cards';
 import './terminal.css';
@@ -88,6 +89,7 @@ export function TerminalSite() {
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollToId = useRef<number | null>(null);
   const bootStarted = useRef(false);
+  const flickerRef = useRef<HTMLDivElement>(null);
 
   const push = useCallback((items: NewEntry[], scrollTo = false) => {
     setEntries((prev) => {
@@ -123,6 +125,20 @@ export function TerminalSite() {
     );
     return () => timers.forEach(clearTimeout);
   }, [push]);
+
+  // Tube flicker, shared with the 3D screen lights (same clock-based signal).
+  useEffect(() => {
+    const el = flickerRef.current;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (!el) return;
+    let raf = 0;
+    const tick = () => {
+      el.style.opacity = reduce.matches ? '0' : String(Math.max(0, 1 - crtFlicker()));
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
 
   useEffect(() => {
     const t = window.setInterval(() => setClock(clockNow()), 20_000);
@@ -326,6 +342,8 @@ export function TerminalSite() {
           <b>G</b>GUI MODE
         </button>
       </nav>
+
+      <div ref={flickerRef} className="tty-flicker" aria-hidden="true" />
 
       {viewer && (
         <Viewer
