@@ -1,0 +1,151 @@
+/**
+ * One shared CRT flicker signal.
+ *
+ * It is a pure function of wall-clock time, so the terminal (inside the
+ * iframe) and the 3D screen lights (in the parent page) compute exactly the
+ * same value at the same moment and flicker in sync without talking to
+ * each other.
+ *
+ *   - a 30 Hz shimmer (the tube's refresh noise)
+ *   - every 6-8 seconds or so a "catch": two quick dips with a small
+ *     sideways jolt of the picture
+ *
+ * Kept under 3 flashes per second (photosensitivity guidance); callers skip
+ * it entirely for prefers-reduced-motion. Tune with FLICKER_STRENGTH.
+ */
+
+import { useSyncExternalStore } from 'react';
+
+/** 0 = off, 1 = default, 2 = very obvious. */
+export const FLICKER_STRENGTH = 1;
+
+export const FLICKER_HZ = 30;
+const WINDOW_MS = 6000; // at most one catch per window (some windows skip)
+const CATCH_MS = 160;
+
+/** Deterministic 0..1 hash of a number. */
+function hash(n: number): number {
+  const x = Math.sin(n * 127.1 + 311.7) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+/** Milliseconds into the current catch, or -1 when not in one. */
+function catchPhase(nowMs: number): { dt: number; w: number } {
+  const w = Math.floor(nowMs / WINDOW_MS);
+  if (hash(w + 0.5) < 0.2) return { dt: -1, w };
+  // Keep ≥ 500 ms from both window edges so two catches are always ≥ 1 s apart.
+  const at = 500 + hash(w + 0.25) * (WINDOW_MS - CATCH_MS - 1000);
+  const dt = nowMs - w * WINDOW_MS - at;
+  return { dt: dt >= 0 && dt < CATCH_MS ? dt : -1, w };
+}
+
+/* ── Light-flicker setting (3D monitor lights only) ────────────────────
+ * Whether the Spline scene's screen glow flickers. The terminal's own
+ * picture flicker is not affected. Saved in localStorage so it is
+ * remembered between visits.
+ */
+const STEADY_KEY = 'crt-steady-light';
+const listeners = new Set<() => void>();
+let steady = readSteady();
+
+function readSteady(): boolean {
+  try {
+    return typeof localStorage !== 'undefined' && localStorage.getItem(STEADY_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('storage', (e) => {
+    if (e.key !== STEADY_KEY) return;
+    steady = e.newValue === '1';
+    listeners.forEach((l) => l());
+  });
+}
+
+export function isSteadyLight(): boolean {
+  return steady;
+}
+
+export function setSteadyLight(value: boolean): void {
+  steady = value;
+  try {
+    localStorage.setItem(STEADY_KEY, value ? '1' : '0');
+  } catch {
+    /* private mode etc. — the setting just won't persist */
+  }
+  listeners.forEach((l) => l());
+}
+
+/** React hook: current steady-light setting, re-renders when it changes. */
+export function useSteadyLight(): boolean {
+  return useSyncExternalStore(
+    (cb) => {
+      listeners.add(cb);
+      return () => listeners.delete(cb);
+    },
+    () => steady,
+    () => false,
+  );
+}
+
+/** Dip amount (0 … ~0.24) of the current catch, 0 when not in one. */
+function catchDip(nowMs: number): number {
+  const { dt, w } = catchPhase(nowMs);
+  if (dt < 0) return 0;
+  // drop – recover – drop – recover
+  const depth = 0.16 + 0.08 * hash(w + 0.75);
+  if (dt < 45) return depth;
+  if (dt < 80) return depth * 0.25;
+  if (dt < 125) return depth * 0.8;
+  return 0;
+}
+
+/** Smooth 0..1 value noise at `hz` changes per second. */
+function smoothNoise(nowMs: number, hz: number, seed: number): number {
+  const x = (nowMs / 1000) * hz;
+  const i = Math.floor(x);
+  const f = x - i;
+  const u = f * f * (3 - 2 * f);
+  return hash(i + seed) * (1 - u) + hash(i + 1 + seed) * u;
+}
+
+/** How unsteady the 3D glow is between catches (fraction of its brightness). */
+const GLOW_WOBBLE = 0.25;
+/** How much deeper the glow dips than the picture on a catch. */
+const GLOW_CATCH_SCALE = 1.5;
+
+/**
+ * Light multiplier for the 3D monitor's screen glow on the case: an uneven,
+ * slow wobble (a few changes per second, no fast buzz) plus a deeper dip on
+ * the same moments as the picture's catches. Returns 1 when the
+ * light-flicker switch is off.
+ */
+export function crtLightFlicker(nowMs: number = Date.now()): number {
+  if (steady) return 1;
+  const { dt, w } = catchPhase(nowMs);
+  // On a catch the glow drops once, for the length of the picture's catch;
+  // otherwise a slow, uneven wobble (≈2 changes a second) reads as an
+  // unsteady tube, not a strobe.
+  const inCatch = dt >= 0 && dt < 125;
+  const depth = (0.16 + 0.08 * hash(w + 0.75)) * GLOW_CATCH_SCALE;
+  const dim = inCatch ? depth : GLOW_WOBBLE * smoothNoise(nowMs, 2, 17.3);
+  return Math.max(0.2, 1 - dim * FLICKER_STRENGTH);
+}
+
+/** Picture brightness multiplier for the terminal (≈0.76 … 1.03 at strength 1). */
+export function crtFlicker(nowMs: number = Date.now()): number {
+  const step = Math.floor((nowMs / 1000) * FLICKER_HZ);
+  const shimmer = (hash(step) - 0.5) * 0.06;
+
+  return 1 + (shimmer - catchDip(nowMs)) * FLICKER_STRENGTH;
+}
+
+/** Sideways jolt of the picture in px during a catch (0 otherwise). */
+export function crtJitter(nowMs: number = Date.now()): number {
+  const { dt, w } = catchPhase(nowMs);
+  if (dt < 0 || dt >= 125) return 0;
+  const dir = hash(w + Math.floor(dt / 40)) > 0.5 ? 1 : -1;
+  return dir * (1 + hash(w + 0.9)) * FLICKER_STRENGTH;
+}
