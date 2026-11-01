@@ -18,8 +18,53 @@ const MAX_BALL_SPEED = 900;
 const SPEEDUP = 1.05;
 const MAX_BOUNCE = (55 * Math.PI) / 180;
 const WIN_SCORE = 7;
+const LOSS_JOKE_DURATION = 4500;
 
 const AI_LEVEL = 4;
+const LOSS_JOKE_ART = `
+                                                                        ████████
+                                                                    ███▒▒▒▒▒▒▒▒▒▒▒▒███
+                                                                 ██▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒███
+                                                 ░▓███████████▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒███████
+                                                █▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒███
+                                                █▒▒▒▒███▒▒▒▒▒▒▒▒▒▒▒█▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██
+                                                ▒██▒▒▒▒▒▒▒██████▒▒█▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██
+                                                  █▒▒▒▒▒▒▒▒▒▒▒▒▒▒█▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒█
+                                                   ██▒▒▒▒▒▒▒▒▒▒▒▒▒▒█████████████████████▓▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓█
+                                                     ███▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓██▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒█▒▒▒▒▒▒▒█
+                                                       ███▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒███▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██▒▒▒▒▓▒▒▒██
+                              ███████████████████████████████████████████████████▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██  ███▒▒▒▒▒▒▒▒▒██
+                                          █████████▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒█  ██▒▒▒▒▒████▒▒▒██
+                                                        ██████████▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒█████▓███
+                                                           █▒▒▒▒▒▒▒▒▒▒▒█████████▒▒▒▒▒▒▒▒▒▒▒██▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒█▒▒▒▒▒████
+                                                          █▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██████████▒▒▒▒▒▒▒▒▒▒▒█▓▒▒▒▒▒██████▒▒▓▒██
+                                                          █▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒█▒▒▒▒▒▒▒▒▒▒▒▒▒▒█▒▒▒█
+                                                          █▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒█▓▒▒██
+                                                         █▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓███▓▒▒▒▒▒▒▒▒▒▓█▒▒▒█▒▒▒▒████▒█
+                                                         █▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██▒▒▒▒▒▒▒▒█▓▒▒▒▒▒▒█████
+                                                         ██▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██ █▒▒▒▓▓▓█▓███▓▒▒▒▒▒▒▒█
+                                                          █▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒███    █▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██
+                                                          █▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██▒██     ████▒▒▒▒▒▒▒▒▒██
+                                                          ██▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██▒▒▒▒█       █  ██████
+                                                           █▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██▒▒▒▒█       █   ███
+                                                           █▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒███▒▒▒██    ██ ██ ██
+                                                           ██▒▒▒▒▒▒▒▒▒▒▒██▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒████▒▒▒█   ██████
+                                                            █▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██▒▒▒▒▒▒▒▒█▒▒▒▒▒▒▒▒▒▒█  █▒▒█ █   █
+                                                            ▒█▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██████▒▒█▒▒▒▒▒▒▒▒▒██ ██▒██ ██ █ █
+                                                             ██▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██▒▒████▒▒▒▒▒▒▒▒███  █▓  ████
+                                                              █▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒████▒▒▒▒▒▒▓▒▒█▒███████
+                                                               █▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓▒▒█  █▓▒▒▒▒▒▒▒▒██▒▒▒▒▒▒▒██
+                                                                ██▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒███     █▒▒▒▒▒▒▒▒▒▒▒▒▒██
+                                                                  █▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒█      ██▒▒▒▒▒▒▒▒▒▒▒██
+                                                                   ██▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒█           ████████
+                                                                     ████▒▒▒▒▒▒▒▒▒▒▒██
+                                                                         ▒█▒▒▒▒▒▒▒▒▒▒█
+                                                                            ██▒▒▒▒▒▒▒▒█
+                                                                               ██▒▒▒▒▒▒█
+                                                                                  ███▒▒▒█
+                                                                                      █████
+                                                                                          ██
+`.split('\n').filter((line) => line.trim().length > 0);
 
 /**
  * Difficulty from level 1-10: how fast the CPU paddle moves, how often it
@@ -45,6 +90,7 @@ type Game = {
   serving: boolean;
   serveDir: 1 | -1;
   winner: 'YOU' | 'CPU' | null;
+  lossJokeAt: number | null;
   aiTarget: number;
   aiError: number;
   aiNextThink: number;
@@ -63,12 +109,20 @@ function newGame(): Game {
     serving: true,
     serveDir: Math.random() < 0.5 ? 1 : -1,
     winner: null,
+    lossJokeAt: null,
     aiTarget: H / 2,
     aiError: 0,
     aiNextThink: 0,
     keys: { up: false, down: false },
     mouseY: null,
   };
+}
+
+function newLossJoke(): Game {
+  const game = newGame();
+  game.winner = 'CPU';
+  game.lossJokeAt = performance.now();
+  return game;
 }
 
 function serve(g: Game) {
@@ -154,11 +208,66 @@ function step(g: Game, dt: number, now: number) {
     g.serving = true;
     g.ball = { x: W / 2, y: H / 2, vx: 0, vy: 0 };
     if (g.score[0] >= WIN_SCORE) g.winner = 'YOU';
-    else if (g.score[1] >= WIN_SCORE) g.winner = 'CPU';
+    else if (g.score[1] >= WIN_SCORE) {
+      g.winner = 'CPU';
+      g.lossJokeAt = now;
+    }
   }
 }
 
-function draw(ctx: CanvasRenderingContext2D, g: Game) {
+function drawLossJoke(ctx: CanvasRenderingContext2D, now: number, startedAt: number) {
+  const progress = clamp((now - startedAt) / LOSS_JOKE_DURATION, 0, 1);
+  ctx.fillStyle = 'rgb(2 7 3 / 94%)';
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor = 'rgb(125 255 138 / 60%)';
+  ctx.shadowBlur = 10;
+  const artIndent = Math.min(...LOSS_JOKE_ART.map((line) => line.length - line.trimStart().length));
+  const art = LOSS_JOKE_ART.map((line) => line.slice(artIndent).trimEnd());
+  const artFontSize = Math.min(7, (W - 32) / Math.max(...art.map((line) => line.length)), 190 / art.length);
+  const artHeight = art.length * artFontSize;
+  ctx.fillStyle = '#0db3d3';
+  ctx.font = `${artFontSize}px monospace`;
+  ctx.textAlign = 'left';
+  const visibleBounds = art.map((line) => {
+    const first = line.search(/\S/);
+    const last = line.trimEnd().length - 1;
+    return {
+      left: ctx.measureText(line.slice(0, first)).width,
+      right: ctx.measureText(line.slice(0, last + 1)).width,
+    };
+  });
+  const artLeft = Math.min(...visibleBounds.map(({ left }) => left));
+  const artRight = Math.max(...visibleBounds.map(({ right }) => right));
+  const artX = (W - (artRight - artLeft)) / 2 - artLeft;
+  art.forEach((line, index) => {
+    ctx.fillText(line, artX, 35 + index * (artHeight / art.length));
+  });
+
+  ctx.shadowColor = 'rgb(125 255 138 / 45%)';
+  ctx.shadowBlur = 6;
+  ctx.fillStyle = '#d6ffd9';
+  ctx.font = '32px VT323, monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('Taking control of account to send messages', W / 2, 275);
+
+  const barWidth = 42;
+  const filled = Math.floor(progress * barWidth);
+  const bar = `[${'#'.repeat(filled)}${'-'.repeat(barWidth - filled)}]`;
+  ctx.font = '28px VT323, monospace';
+  ctx.fillStyle = '#7dff8a';
+  ctx.fillText(bar, W / 2, 325);
+
+  if (progress === 1) {
+    ctx.fillStyle = '#ffcf5a';
+    ctx.font = '42px VT323, monospace';
+    ctx.fillText('JUST KIDDING!', W / 2, 390);
+  }
+}
+
+function draw(ctx: CanvasRenderingContext2D, g: Game, now: number) {
   const fg = '#7dff8a';
   const hot = '#d6ffd9';
   const dim = '#1f5a29';
@@ -195,12 +304,21 @@ function draw(ctx: CanvasRenderingContext2D, g: Game) {
       ctx.fillText('PRESS SPACE TO SERVE', W / 2, H / 2);
     }
   }
+  if (g.winner === 'CPU' && g.lossJokeAt != null) {
+    drawLossJoke(ctx, now, g.lossJokeAt);
+  }
   ctx.shadowBlur = 0;
 }
 
-export function Pong({ onClose }: { onClose: (score: [number, number]) => void }) {
+export function Pong({
+  onClose,
+  startWithLossJoke = false,
+}: {
+  onClose: (score: [number, number]) => void;
+  startWithLossJoke?: boolean;
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const game = useRef<Game>(newGame());
+  const game = useRef<Game>(startWithLossJoke ? newLossJoke() : newGame());
   const onCloseRef = useRef(onClose);
   useEffect(() => {
     onCloseRef.current = onClose;
@@ -213,6 +331,8 @@ export function Pong({ onClose }: { onClose: (score: [number, number]) => void }
 
     const pressServe = () => {
       const g = game.current;
+      if (startWithLossJoke) return;
+      if (g.winner === 'CPU' && g.lossJokeAt != null && performance.now() - g.lossJokeAt < LOSS_JOKE_DURATION) return;
       if (g.winner) game.current = newGame();
       else if (g.serving) serve(g);
     };
@@ -254,7 +374,7 @@ export function Pong({ onClose }: { onClose: (score: [number, number]) => void }
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
       step(game.current, dt, now);
-      draw(ctx, game.current);
+      draw(ctx, game.current, now);
       raf = requestAnimationFrame(frame);
     };
     raf = requestAnimationFrame(frame);
@@ -267,13 +387,13 @@ export function Pong({ onClose }: { onClose: (score: [number, number]) => void }
       canvas.removeEventListener('pointermove', onPointerMove);
       canvas.removeEventListener('pointerdown', onPointerDown);
     };
-  }, []);
+  }, [startWithLossJoke]);
 
   return (
     <div className="tty-window-backdrop">
       <div className="tty-window tty-game" role="dialog" aria-modal="true" aria-label="Pong">
         <div className="tty-window-title">
-          <span>C:\OMAI\GAMES\PONG.EXE — CPU LEVEL {AI_LEVEL}</span>
+          <span>{startWithLossJoke ? 'C:\\OMAI\\BEAST.EXE' : `C:\\OMAI\\GAMES\\PONG.EXE — CPU LEVEL ${AI_LEVEL}`}</span>
           <button
             type="button"
             onClick={() => onClose([...game.current.score])}

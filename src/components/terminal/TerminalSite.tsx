@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { AsciiSpline } from './AsciiSpline';
+import { Arcade, type ArcadeKind } from './Arcade';
 import { Pong } from './Pong';
 import { Snake } from './Snake';
 import { CrtErrorBoundary } from '@/components/crt/CrtErrorBoundary';
@@ -83,7 +84,7 @@ export function TerminalSite() {
   const [booted, setBooted] = useState(false);
   const [input, setInput] = useState('');
   const [viewer, setViewer] = useState<{ which: Gallery; index: number } | null>(null);
-  const [game, setGame] = useState<'pong' | 'snake' | null>(null);
+  const [game, setGame] = useState<'pong' | 'snake' | 'beast' | ArcadeKind | null>(null);
   const [clock, setClock] = useState(clockNow);
   const nextId = useRef(1);
   const history = useRef<string[]>([]);
@@ -241,9 +242,26 @@ export function TerminalSite() {
           out.push({ kind: 'text', text: 'Loading PONG.EXE…', tone: 'dim' });
           setGame('pong');
           break;
+        case 'beast':
+          out.push({ kind: 'text', text: 'Loading BEAST.EXE…', tone: 'dim' });
+          setGame('beast');
+          break;
         case 'snake':
           out.push({ kind: 'text', text: 'Loading SNAKE.EXE…', tone: 'dim' });
           setGame('snake');
+          break;
+        case 'breakout':
+          out.push({ kind: 'text', text: 'Loading BREAKOUT.EXE…', tone: 'dim' });
+          setGame('breakout');
+          break;
+        case 'tetris':
+          out.push({ kind: 'text', text: 'Loading TETRIS.EXE…', tone: 'dim' });
+          setGame('tetris');
+          break;
+        case 'invaders':
+        case 'spaceinvaders':
+          out.push({ kind: 'text', text: 'Loading INVADERS.EXE…', tone: 'dim' });
+          setGame('invaders');
           break;
         case 'sudo':
           out.push({ kind: 'text', text: 'Nice try.', tone: 'amber' });
@@ -374,11 +392,18 @@ export function TerminalSite() {
         />
       )}
 
-      {game === 'pong' && (
+      {(game === 'pong' || game === 'beast') && (
         <Pong
+          startWithLossJoke={game === 'beast'}
           onClose={([you, cpu]) => {
             setGame(null);
-            push([{ kind: 'text', text: `PONG.EXE exited. YOU ${you} — CPU ${cpu}`, tone: you > cpu ? 'hot' : 'dim' }]);
+            push([
+              {
+                kind: 'text',
+                text: game === 'beast' ? 'BEAST.EXE exited.' : `PONG.EXE exited. YOU ${you} — CPU ${cpu}`,
+                tone: game === 'beast' || you > cpu ? 'hot' : 'dim',
+              },
+            ]);
           }}
         />
       )}
@@ -387,6 +412,16 @@ export function TerminalSite() {
           onClose={(score, best) => {
             setGame(null);
             push([{ kind: 'text', text: `SNAKE.EXE exited. SCORE ${score} · BEST ${best}`, tone: 'dim' }]);
+          }}
+        />
+      )}
+      {(game === 'breakout' || game === 'tetris' || game === 'invaders') && (
+        <Arcade
+          kind={game}
+          onClose={(score) => {
+            const title = game.toUpperCase();
+            setGame(null);
+            push([{ kind: 'text', text: `${title}.EXE exited. SCORE ${score}`, tone: 'dim' }]);
           }}
         />
       )}
@@ -416,6 +451,7 @@ function Help() {
     ['ABOUT', 'Who is Omai'],
     ['TOOLS', 'Installed programs'],
     ['CONTACT', 'Email and socials'],
+    ['GAMES', 'PONG, SNAKE, BREAKOUT, TETRIS, INVADERS, BEAST'],
     ['CLS', 'Clear the screen'],
     ['GUI', 'Switch to the full graphical site'],
   ];
