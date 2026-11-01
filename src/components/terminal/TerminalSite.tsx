@@ -5,6 +5,7 @@ import { Pong } from './Pong';
 import { Snake } from './Snake';
 import { CrtErrorBoundary } from '@/components/crt/CrtErrorBoundary';
 import { crtFlicker, crtJitter } from '@/components/crt/crt-flicker';
+import { crtSound } from '@/components/crt/crt-sound';
 import { DESIGN_WORK, LINKS, PHOTO_WORK, TOOLS, VIDEOS } from '@/data/portfolio';
 import type { FocusCard } from '@/components/ui/focus-cards';
 import './terminal.css';
@@ -108,7 +109,11 @@ export function TerminalSite() {
     if (bootStarted.current) return;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const steps: (() => void)[] = [
-      ...BOOT.map((l) => () => push([{ kind: 'text', ...l }])),
+      ...BOOT.map((l, i) => () => {
+        push([{ kind: 'text', ...l }]);
+        if (i === 0) crtSound.beep('post');
+        if (i === 2) crtSound.drives();
+      }),
       () => push([{ kind: 'hero' }]),
       () => push(MOTD.map((l) => ({ kind: 'text' as const, ...l }))),
       () => {
@@ -151,6 +156,21 @@ export function TerminalSite() {
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
+  }, []);
+
+  // Keyboard clicks for key presses on the terminal (not while a game runs).
+  const gameOpen = useRef(false);
+  useEffect(() => {
+    gameOpen.current = game != null;
+  }, [game]);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (gameOpen.current || e.repeat) return;
+      if (['Shift', 'Control', 'Alt', 'Meta', 'CapsLock'].includes(e.key)) return;
+      crtSound.key(e.key === 'Enter' ? 'enter' : 'key');
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
   }, []);
 
   useEffect(() => {
@@ -272,6 +292,7 @@ export function TerminalSite() {
           (window.top ?? window).location.href = '/?screen';
           break;
         default:
+          crtSound.beep('error');
           out.push({ kind: 'text', text: 'Bad command or file name. Type HELP.', tone: 'amber' });
       }
       push(out, true);
