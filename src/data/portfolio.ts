@@ -52,7 +52,7 @@ export const DESIGN_WORK: WorkItem[] = [
     title: 'VEGAS',
     src: '/assets/work/vegas.webp',
     accentColor: '#3b82f6',
-    description: 'Fan work: an unofficial Valorant × Formula 1 crossover poster for the Las Vegas race. A 3D agent and an F1 car charged with lightning, under heavy display type.',
+    description: 'Fan work: an unofficial Valorant × Formula 1 crossover poster for the Las Vegas race, not affiliated with Riot Games or Formula 1. Neon charges an F1 car with lightning under heavy display type.',
   },
   {
     title: 'The Doorman',
@@ -85,10 +85,10 @@ export const DESIGN_WORK: WorkItem[] = [
     description: 'A transit-map inspired identity system — wordmark, submark, a numbered colour set and a Coolvetica + Helvetica type pairing, built to roll out across posts and signage.',
   },
   {
-    title: 'CS Midterm Study Session',
-    src: '/assets/work/cs-midterm-study-session.webp',
+    title: 'Shooting Stars Studio — Logo',
+    src: '/assets/work/shooting-stars-logo.webp',
     accentColor: '#3b82f6',
-    description: "Key visual for PUP ASCII's two-day CS midterm study session — the anchor for a campaign of speaker cards, schedules and reminder posts.",
+    description: 'Logo work: the Shooting Stars Studio identity. A stacked wordmark with a shooting star breaking out of its frame, plus a chrome version of the star as a standalone mark.',
   },
   // 30 Day Design Challenge (in posting order; day 18, SANA, isn't exported yet)
   {
