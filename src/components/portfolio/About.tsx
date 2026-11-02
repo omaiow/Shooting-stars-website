@@ -47,7 +47,8 @@ export const About = memo(function About() {
             <p className="text-neutral-300 text-lg leading-relaxed">
               Hi! I'm <span className="text-white font-semibold">Shaun Sia</span>, otherwise known as{' '}
               <span className="text-[#2563eb] font-semibold">Omai</span> online. I'm a Graphic Designer
-              and UI/UX Designer with extensive experience leading creative teams.
+              with extensive experience leading creative teams, and I take on the occasional UI/UX
+              project too.
             </p>
             <p className="text-neutral-400 leading-relaxed">
               I specialize in <span className="text-white">Photoshop</span> for graphics and photo manipulation,

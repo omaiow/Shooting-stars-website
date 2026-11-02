@@ -4,7 +4,7 @@ import Spline from '@splinetool/react-spline';
 import { scrollToSection } from '@/lib/scroll';
 import { CrtErrorBoundary } from '@/components/crt/CrtErrorBoundary';
 
-const SUBTITLE = "Graphic Designer · UI/UX Designer · Video Editor · Creative Lead";
+const SUBTITLE = "Graphic Designer · Video Editor · Creative Lead";
 
 export function Hero() {
   // Mouse parallax

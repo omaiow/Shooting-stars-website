@@ -60,7 +60,7 @@ const TOUCH =
 
 const MOTD: { text: string; tone?: 'dim' | 'hot' | 'amber' }[] = [
   { text: 'SHAUN SIA — OMAI', tone: 'hot' },
-  { text: 'Graphic Designer · UI/UX Designer · Video Editor · Creative Lead' },
+  { text: 'Graphic Designer · Video Editor · Creative Lead' },
   { text: '' },
   {
     text: TOUCH ? 'Tap a program below, or type HELP.' : 'Pick a program below, press 1-6, or type HELP.',
@@ -616,8 +616,8 @@ function About() {
       <div className="tty-line tty-dim">TYPE ABOUT.TXT</div>
       <div className="tty-line">
         Hi! I'm <span className="tty-hot">Shaun Sia</span>, otherwise known as{' '}
-        <span className="tty-hot">Omai</span> online. I'm a Graphic Designer and UI/UX Designer with
-        extensive experience leading creative teams.
+        <span className="tty-hot">Omai</span> online. I'm a Graphic Designer with extensive
+        experience leading creative teams, and I take on the occasional UI/UX project too.
       </div>
       <div className="tty-line">&nbsp;</div>
       <div className="tty-line">
@@ -743,14 +743,18 @@ function Viewer({
               </>
             ) : (
               <>
-                <div>
-                  <span className="tty-dim">LOCATION </span>
-                  {it.location}
-                </div>
-                <div>
-                  <span className="tty-dim">CAMERA   </span>
-                  {it.camera}
-                </div>
+                {it.location && (
+                  <div>
+                    <span className="tty-dim">LOCATION </span>
+                    {it.location}
+                  </div>
+                )}
+                {it.camera && (
+                  <div>
+                    <span className="tty-dim">CAMERA   </span>
+                    {it.camera}
+                  </div>
+                )}
                 {it.thoughtProcess && <div>{it.thoughtProcess}</div>}
               </>
             )}

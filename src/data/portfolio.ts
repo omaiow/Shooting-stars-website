@@ -6,16 +6,22 @@ import type { FocusCard } from '@/components/ui/focus-cards';
 
 export const DESIGN_WORK: FocusCard[] = [
   {
-    title: 'Formula 1 Inspired',
-    src: "https://i.imgur.com/4Q1hHuW.jpeg",
+    title: 'The College Dream',
+    src: '/assets/work/college-dream.webp',
     accentColor: '#3b82f6',
-    description: 'A high-octane poster series inspired by F1 racing aesthetics — speed, precision, motion blur.',
-    process: 'Started with high-res reference photos and existing 3d models of the cars from the internet. I then used blender to edit the models to customize the cars to fit the branding of my academic organization (PUP ASCII) and to get the angles and lighting i wanted for the shot. I then took it into photoshop to composite the image along with the text and other elements.',
-    software: [
-      { name: 'Photoshop', role: 'Compositing, motion FX & typography' },
-      { name: 'Blender', role: '3D modeling and rendering' },
-
-    ],
+    description: 'A surreal photo manipulation: a train door hung in an ornate gold frame on a weathered wall, like a painting of somewhere you would rather be.',
+  },
+  {
+    title: 'VEGAS',
+    src: '/assets/work/vegas.webp',
+    accentColor: '#3b82f6',
+    description: 'Fan work: an unofficial Valorant × Formula 1 crossover poster for the Las Vegas race. A 3D agent and an F1 car charged with lightning, under heavy display type.',
+  },
+  {
+    title: 'The Doorman',
+    src: '/assets/work/the-doorman.webp',
+    accentColor: '#3b82f6',
+    description: 'A high-contrast poster: a lone silhouette in a blown-out doorway, crowned by a ring of keys.',
   },
   {
     title: 'Better Together',
@@ -31,14 +37,34 @@ export const DESIGN_WORK: FocusCard[] = [
     ],
   },
   {
-    title: 'Resident Evil Inspired',
-    src: "https://i.imgur.com/MphiG3h.jpeg",
+    title: 'Formula 1 Inspired',
+    src: "https://i.imgur.com/4Q1hHuW.jpeg",
     accentColor: '#3b82f6',
-    description: 'A funny, survival-horror themed poster inspired by the Resident Evil franchise visual language.',
-    process: 'I was watching let\'s plays of Resident Evil Requiem and was really inspired by the game\'s atmosphere and visual language. I wanted to create a poster that looked like you picked up an item in the game and made it kinda a goofy item inkeeping with the humor of Resident Evil.',
+    description: 'A high-octane poster series inspired by F1 racing aesthetics — speed, precision, motion blur.',
+    process: 'Started with high-res reference photos and existing 3d models of the cars from the internet. I then used blender to edit the models to customize the cars to fit the branding of my academic organization (PUP ASCII) and to get the angles and lighting i wanted for the shot. I then took it into photoshop to composite the image along with the text and other elements.',
     software: [
-      { name: 'Photoshop', role: 'Texture layering, masking & distress FX' },
+      { name: 'Photoshop', role: 'Compositing, motion FX & typography' },
+      { name: 'Blender', role: '3D modeling and rendering' },
+
     ],
+  },
+  {
+    title: 'Station 32',
+    src: '/assets/work/station-32.webp',
+    accentColor: '#3b82f6',
+    description: 'A transit-map inspired identity system — wordmark, submark, a numbered colour set and a Coolvetica + Helvetica type pairing, built to roll out across posts and signage.',
+  },
+  {
+    title: 'Spider-Man: Brand New Day (Fan Poster)',
+    src: '/assets/work/spider-man-brand-new-day.webp',
+    accentColor: '#3b82f6',
+    description: 'Fan work: an unofficial poster for Spider-Man: Brand New Day, not affiliated with Marvel or Sony. A lone figure on a ledge above the city at golden hour, with a cast strip under the title.',
+  },
+  {
+    title: 'All Saints Day',
+    src: '/assets/work/all-saints.webp',
+    accentColor: '#3b82f6',
+    description: 'A holiday post for PUP ASCII, pairing a classical painting with flowing script type.',
   },
   {
     title: 'Kanibalismo',
@@ -51,30 +77,30 @@ export const DESIGN_WORK: FocusCard[] = [
       { name: 'Figma', role: 'Layout & vector graphics' },
     ],
   },
-  {
-    title: 'Retro Design',
-    src: "https://i.imgur.com/yxSY9Mk.jpeg",
-    accentColor: '#3b82f6',
-    description: 'A throwback aesthetic piece pulling from 70s–80s print design — grain, muted palettes, and vintage type.',
-    process: 'Added film grain and halftone overlays on top of the base composition, then pushed the warmth and reduced contrast to mimic aged print. Typography was sourced from display fonts common in that era.',
-    software: [
-      { name: 'Photoshop', role: 'Grain, halftone FX & vintage colour treatment' },
-    ],
-  },
-  {
-    title: 'Pop Design',
-    src: "https://i.imgur.com/X05z60Q.jpeg",
-    accentColor: '#3b82f6',
-    description: 'A bold, maximalist pop art piece — flat colours, loud type, high contrast.',
-    process: 'Inspired by pop art and contemporary pop illustration. Started with a clean vector base in Figma for the layout, then moved to Photoshop to add halftone dots and light effects. The goal was to feel unapologetically loud.',
-    software: [
-      { name: 'Figma', role: 'Layout & vector structure' },
-      { name: 'Photoshop', role: 'Halftone FX, colour fills & final composition' },
-    ],
-  },
 ];
 
 export const PHOTO_WORK: FocusCard[] = [
+  {
+    title: 'The Stairs',
+    src: '/assets/work/binondo-stairs.webp',
+    accentColor: '#2563eb',
+    location: 'Binondo, Manila',
+    camera: 'Nikon D7200',
+  },
+  {
+    title: 'The Arch',
+    src: '/assets/work/binondo-arch.webp',
+    accentColor: '#2563eb',
+    location: 'Binondo, Manila',
+    camera: 'iPhone 11',
+  },
+  {
+    title: 'The Call',
+    src: '/assets/work/binondo-payphone.webp',
+    accentColor: '#2563eb',
+    location: 'Binondo, Manila',
+    camera: 'Nikon D7200',
+  },
   {
     title: 'The Wall',
     src: 'https://i.imgur.com/N7dSjW0.jpeg',
@@ -84,20 +110,17 @@ export const PHOTO_WORK: FocusCard[] = [
     thoughtProcess: 'I was walking around Intramuros and i saw this wall with this window that was so compelling it felt serene and i just had to take a picture.',
   },
   {
-    title: 'The City',
-    src: "https://i.imgur.com/ZcF1qCu.jpeg",
+    title: 'The Ride',
+    src: '/assets/work/binondo-bikes.webp',
     accentColor: '#2563eb',
-    location: 'Pasig City',
-    camera: 'IPhone 11',
-    thoughtProcess: 'The sharp angles of the architecture caught my eye. It felt suffocating but weirdly calming.',
+    location: 'Binondo, Manila',
+    camera: 'Nikon D7200',
   },
   {
-    title: 'The Train',
-    src: "https://i.imgur.com/6vnFaGc.jpeg",
+    title: 'The Basilica',
+    src: '/assets/work/quiapo.webp',
     accentColor: '#2563eb',
-    location: 'Dr Santos Station',
-    camera: 'iPhone 11',
-    thoughtProcess: 'I was going on a walk with my friends and we noticed this scene. I thought it would be a great shot. The soft, diffused light coming from the window was perfect.',
+    location: 'Quiapo, Manila',
   },
   {
     title: 'The Crosswalk',
@@ -108,20 +131,18 @@ export const PHOTO_WORK: FocusCard[] = [
     thoughtProcess: 'Street photography is about capturing raw, unfiltered moments. I was walking to Fort Santiago and before i crossed the street a beam of light suddenly hit the sidewalk and an overwhelming feeling of calm washed over me, it was as if everything went silent and all that mattered was that moment. I knew i had to capture this moment.',
   },
   {
+    title: 'After the Rain',
+    src: '/assets/work/after-rain.webp',
+    accentColor: '#2563eb',
+    camera: 'iPhone 11',
+  },
+  {
     title: 'The Feeling',
     src: "https://i.imgur.com/02Y4tXT.jpeg",
     accentColor: '#2563eb',
     location: 'Smart Araneta Coliseum',
     camera: 'Sony Powershot SX430 IS',
     thoughtProcess: 'During the Chromokopia Tyler the Creator concert, I felt so moved by the performance that I had to capture the moment. I used the long exposure to capture the movement of the lights and the crowd.',
-  },
-  {
-    title: 'The Obelisk',
-    src: "https://i.imgur.com/6LgLFZu.jpeg",
-    accentColor: '#2563eb',
-    location: 'Polytechnic University of the Philippines Manila',
-    camera: 'Canon EOS M50 Mark II',
-    thoughtProcess: 'It was a school ecavent and the we were there early to prepare our booth, and i noticed the way the light was hitting the obelisk and it caught my eye.',
   },
 ];
 
