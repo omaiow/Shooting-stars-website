@@ -58,7 +58,7 @@ export const DESIGN_WORK: WorkItem[] = [
     title: 'The Doorman',
     src: '/assets/work/the-doorman.webp',
     accentColor: '#3b82f6',
-    description: 'A high-contrast poster: a lone silhouette in a blown-out doorway, crowned by a ring of keys.',
+    description: "Fan work: an unofficial poster of the Doorman from Valve's Deadlock, not affiliated with Valve. A lone silhouette in a blown-out doorway, crowned by a ring of keys.",
   },
   {
     title: 'Spider-Man: Brand New Day (Fan Poster)',
@@ -85,10 +85,10 @@ export const DESIGN_WORK: WorkItem[] = [
     description: 'A transit-map inspired identity system — wordmark, submark, a numbered colour set and a Coolvetica + Helvetica type pairing, built to roll out across posts and signage.',
   },
   {
-    title: 'All Saints Day',
-    src: '/assets/work/all-saints.webp',
+    title: 'CS Midterm Study Session',
+    src: '/assets/work/cs-midterm-study-session.webp',
     accentColor: '#3b82f6',
-    description: 'A holiday post for PUP ASCII, pairing a classical painting with flowing script type.',
+    description: "Key visual for PUP ASCII's two-day CS midterm study session — the anchor for a campaign of speaker cards, schedules and reminder posts.",
   },
   // 30 Day Design Challenge (in posting order; day 18, SANA, isn't exported yet)
   {
