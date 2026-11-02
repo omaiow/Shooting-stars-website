@@ -1,7 +1,7 @@
 // Photography section using Aceternity Focus Cards
 // Instagram: @shauncena17
 import { FocusCards } from '../ui/focus-cards';
-import { PHOTO_WORK } from '@/data/portfolio';
+import { PHOTO_WORK, showcase } from '@/data/portfolio';
 
 export function PhotoSection() {
   return (
@@ -25,7 +25,7 @@ export function PhotoSection() {
           </a>
         </div>
 
-        <FocusCards cards={PHOTO_WORK} />
+        <FocusCards cards={showcase(PHOTO_WORK)} />
 
         <div className="mt-8 flex flex-wrap gap-2">
           {['Lightroom', 'Photography', 'Color Grading', 'Personal Work'].map(tag => (

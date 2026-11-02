@@ -1,7 +1,7 @@
 // Graphic Design section using Aceternity Focus Cards
 // Instagram: @omai.design
 import { FocusCards } from '../ui/focus-cards';
-import { DESIGN_WORK } from '@/data/portfolio';
+import { DESIGN_WORK, showcase } from '@/data/portfolio';
 
 export function DesignSection() {
   return (
@@ -25,7 +25,7 @@ export function DesignSection() {
           </a>
         </div>
 
-        <FocusCards cards={DESIGN_WORK} />
+        <FocusCards cards={showcase(DESIGN_WORK)} />
 
         <div className="mt-8 flex flex-wrap gap-2">
           {['Photoshop', 'Figma', 'Publications', 'Logos', 'Brand Identity'].map(tag => (
